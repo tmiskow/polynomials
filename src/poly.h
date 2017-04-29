@@ -87,7 +87,7 @@ static inline Mono MonoFromPoly(const Poly *p, poly_exp_t e)
  */
 static inline bool PolyIsCoeff(const Poly *p)
 {
-    /* TODO */
+    return (p->mono_list == NULL);
 }
 
 /**
@@ -97,7 +97,7 @@ static inline bool PolyIsCoeff(const Poly *p)
  */
 static inline bool PolyIsZero(const Poly *p)
 {
-    /* TODO */
+    return (PolyIsCoeff(p) && p->coeff == 0);
 }
 
 /**
