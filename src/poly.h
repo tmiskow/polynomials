@@ -71,7 +71,7 @@ static inline Poly PolyZero()
  */
 static inline Mono MonoFromPoly(const Poly *p, poly_exp_t e)
 {
-    return (Mono) {.p = *p, .exp = e};
+    return (Mono) {.p = *p, .exp = e, .next = NULL};
 }
 
 /**
