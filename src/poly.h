@@ -56,7 +56,7 @@ struct Mono
  */
 static inline Poly PolyFromCoeff(poly_coeff_t c)
 {
-    /* TODO */
+    return (Poly) {.mono_list = NULL, .coeff = c};
 }
 
 /**
@@ -65,7 +65,7 @@ static inline Poly PolyFromCoeff(poly_coeff_t c)
  */
 static inline Poly PolyZero()
 {
-    /* TODO */
+    return (Poly) {.mono_list = NULL, .coeff = 0};
 }
 
 /**
