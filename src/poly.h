@@ -18,17 +18,23 @@ typedef long poly_coeff_t;
 /** Typ wykładników wielomianu */
 typedef int poly_exp_t;
 
+/** Definicja typu Poly */
+typedef struct Poly Poly;
+
+/** Definicja typu Mono */
+typedef struct Mono Mono;
+
 /** Struktura przechowująca wielomian.
  * Wielomian to lista jednomianów albo stały współczynnik liczbowy.
  * Wskaźnik `mono_list` wskazuje na pierwszy element listy.
  * Jeżeli `mono_list` ma wartość `NULL`, to lista jest pusta,
  * a wielomian jest stały i ma wartość `coeff`.
  */
-typedef struct Poly
+struct Poly
 {
     struct Mono* mono_list; ///< lista jednomianów
 	poly_coeff_t coeff; ///< stały współczynnik
-} Poly;
+};
 
 /** Struktura przechowująca jednomian.
   * Jednomian ma postać `p * x^e`.
@@ -36,12 +42,12 @@ typedef struct Poly
   * Będzie on traktowany jako wielomian nad kolejną zmienną (nie nad x).
   * Wskaźnik `next` wskazuje na następny wielomian w liście.
   */
-typedef struct Mono
+struct Mono
 {
     Poly p; ///< współczynnik
     poly_exp_t exp; ///< wykładnik
     Mono* next; ///< następny jednomian
-} Mono;
+};
 
 /**
  * Tworzy wielomian, który jest współczynnikiem.
