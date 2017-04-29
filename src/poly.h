@@ -18,13 +18,16 @@ typedef long poly_coeff_t;
 /** Typ wykładników wielomianu */
 typedef int poly_exp_t;
 
-/**
- * Struktura przechowująca wielomian
- * TODO
+/** Struktura przechowująca wielomian.
+ * Wielomian to lista jednomianów albo stały współczynnik liczbowy.
+ * Wskaźnik `mono_list` wskazuje na pierwszy element listy.
+ * Jeżeli `mono_list` ma wartość `NULL`, to lista jest pusta,
+ * a wielomian jest stały i ma wartość `coeff`.
  */
 typedef struct Poly
 {
-    /* TODO */
+    struct Mono* mono_list; ///< lista jednomianów
+	poly_coeff_t coeff; ///< stały współczynnik
 } Poly;
 
 /**
