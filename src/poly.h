@@ -129,10 +129,7 @@ Poly PolyClone(const Poly *p);
  * @param[in] m : jednomian
  * @return skopiowany jednomian
  */
-static inline Mono MonoClone(const Mono *m)
-{
-    /* TODO */
-}
+Mono MonoClone(const Mono *m);
 
 /**
  * Dodaje dwa wielomiany.
