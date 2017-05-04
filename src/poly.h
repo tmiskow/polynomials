@@ -113,7 +113,7 @@ void PolyDestroy(Poly *p);
  */
 static inline void MonoDestroy(Mono *m)
 {
-    /* TODO */
+    PolyDestroy(&(m->p));
 }
 
 /**
