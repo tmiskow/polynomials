@@ -10,15 +10,22 @@
 
 // Funkcje pomocnicze
 
-
 /**
  * Rekurencyjnie usuwa z pamięci jednomiany znajdujące się w liście.
  * @param[in] m : pierwszy jednomian w liście
  */
-void MonoListDestroy(Mono *m) {
+void MonoListDestroy(Mono *m)
+{
 	if (m)
 	{
 		MonoListDestroy(m->next);
 		free(m);
 	}
+}
+
+// Funkcje główne
+
+void PolyDestroy(Poly *p)
+{
+	MonoListDestroy(p->mono_list);
 }
