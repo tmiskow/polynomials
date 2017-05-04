@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 /** Typ współczynników wielomianu */
 typedef long poly_coeff_t;
