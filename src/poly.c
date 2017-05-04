@@ -5,3 +5,20 @@
    @copyright Uniwersytet Warszawski
    @date TODO
 */
+
+#include "poly.h"
+
+// Funkcje pomocnicze
+
+
+/**
+ * Rekurencyjnie usuwa z pamięci jednomiany znajdujące się w liście.
+ * @param[in] m : pierwszy jednomian w liście
+ */
+void MonoListDestroy(Mono *m) {
+	if (m)
+	{
+		MonoListDestroy(m->next);
+		free(m);
+	}
+}
