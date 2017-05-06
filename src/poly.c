@@ -58,22 +58,23 @@ static inline Mono MonoAdd(const Mono* m, const Mono* n)
 
 /**
  * Wstawia jednomian na odpowiednie miejsce w liście.
- * @param[in] mono_list : wskaźnik na listę
+ * @param[in] mono_list : lista jednomianów
  * @param[in] m : jednomian
+ * @return zaktualizowana lista
  */
-static void MonoListAddMono(Mono** mono_list, const Mono* m)
+static Mono* MonoListAddMono(Mono* mono_list, const Mono* m)
 {
 	Mono* new_mono = (Mono*) malloc(sizeof (Mono));
 
-	if (*mono_list)
+	if (mono_list)
 	{
-		Mono* temp_pointer = *mono_list;
+		Mono* temp_pointer = mono_list;
 
 		if (temp_pointer->exp == m->exp)
 		{
 			*new_mono = MonoAdd(temp_pointer, m);
 			new_mono->next = temp_pointer->next;
-			*mono_list = new_mono;
+			return new_mono;
 		}
 
 		else if (temp_pointer->exp > m->exp)
@@ -84,7 +85,7 @@ static void MonoListAddMono(Mono** mono_list, const Mono* m)
 				.p = m->p,
 				.next = temp_pointer
 			};
-			*mono_list = new_mono;
+			return new_mono;
 		}
 
 		else
@@ -123,6 +124,8 @@ static void MonoListAddMono(Mono** mono_list, const Mono* m)
 				};
 				temp_pointer->next = new_mono;
 			}
+
+			return mono_list;
 		}
 	}
 
@@ -134,11 +137,9 @@ static void MonoListAddMono(Mono** mono_list, const Mono* m)
 			.p = m->p,
 			.next = NULL
 		};
-		*mono_list = new_mono;
+		return new_mono;
 	}
 }
-
-
 
 // Funkcje główne
 
