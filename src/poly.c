@@ -216,6 +216,86 @@ static Poly PolyAddMono(const Poly *p, const Mono *m)
 	}
 }
 
+/**
+ * Mnoży dwa jednomiany.
+ * @param[in] m : jednomian
+ * @param[in] n : jednomian
+ * @return `n * n`
+ */
+static Mono MonoMul(const Mono *m, const Mono *n)
+{
+	return (Mono)
+	{
+		.exp = (m->exp) + (n->exp),
+		.p = PolyMul(&(m->p), &(n->p))
+	};
+}
+
+/**
+ * Tworzy jednomian składający się z jednego jednomianu.
+ * Przejmuje na własność zawartość struktury wskazywanej przez @p m.
+ * @param[in] m : jednomian
+ * @return wielomian
+ */
+static Poly PolyFromMono(const Mono *m)
+{
+   if (MonoIsConst(m))
+   {
+	   return m->p;
+   }
+
+   else
+   {
+	   Poly p = PolyZero();
+	   p = PolyAddMono(&p, m);
+	   return p;
+   }
+}
+
+/**
+ * Mnoży wielomian przez jednomian.
+ * @param[in] p : wielomian
+ * @param[in] m : jednomian
+ * @return `p * m`
+ */
+static Poly PolyMulByMono(const Poly *p, const Mono *m)
+{
+	if (!MonoIsZero(m))
+	{
+		if (PolyIsZero(p))
+		{
+			return PolyZero();
+		}
+
+		else if (PolyIsCoeff(p))
+		{
+			Mono* new_mono = (Mono*) malloc(sizeof (Mono));
+			*new_mono = MonoClone(m);
+			return PolyFromMono(new_mono);
+		}
+
+		else
+		{
+			Poly new_poly = PolyZero();
+			Mono* temp_pointer = p->mono_list;
+
+			while (temp_pointer)
+			{
+				Mono temp_mono = MonoMul(temp_pointer, m);
+				new_poly = PolyAddMono(&new_poly, &temp_mono);
+				temp_pointer = temp_pointer->next;
+			}
+
+			return new_poly;
+		}
+	}
+
+	else
+	{
+		return PolyZero();
+	}
+}
+
 // Funkcje główne
 
 void PolyDestroy(Poly *p)
@@ -269,6 +349,7 @@ Poly PolyAdd(const Poly *p, const Poly *q)
 		while (temp_pointer)
 		{
 			new_poly = PolyAddMono(&new_poly, temp_pointer);
+			temp_pointer = temp_pointer->next;
 		}
 
 		return new_poly;
