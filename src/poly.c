@@ -20,6 +20,16 @@
 	 return PolyIsZero(&(m->p));
  }
 
+ /**
+  * Sprawdza, czy jednomian jest stały.
+  * @param[in] m : jednomian
+  * @return Czy wielomian jest stały?
+  */
+ static bool MonoIsConst(const Mono *m)
+ {
+	 return (m->exp == 0 && PolyIsCoeff(&(m->p)));
+ }
+
 /**
  * Rekurencyjnie usuwa z pamięci jednomiany znajdujące się w liście.
  * @param[in] m : pierwszy jednomian w liście
@@ -166,6 +176,43 @@ static Mono* MonoListAddMono(Mono* mono_list, const Mono* m)
 			.next = NULL
 		};
 		return new_mono;
+	}
+}
+
+/**
+ * Dodaje pojedynczy jednomian do wielomianu.
+ * @param[in] p : wielomian
+ * @param[in] m : jednomian
+ * @return `p + m`
+ */
+static Poly PolyAddMono(const Poly *p, const Mono *m)
+{
+	if (PolyIsCoeff(p))
+	{
+		if (MonoIsConst(m))
+		{
+			poly_coeff_t new_coeff = p->coeff + (m->p).coeff;
+			return (Poly) {.mono_list = NULL, .coeff = new_coeff};
+		}
+
+		else
+		{
+			Mono temp_mono = MonoFromPoly(p, 0);
+			Poly temp_poly = (Poly)
+			{
+				.mono_list = MonoListAddMono((p->mono_list), m),
+				.coeff = 0
+			};
+			return PolyAddMono(&temp_poly, &temp_mono);
+		}
+	}
+
+	else
+	{
+		return (Poly) {
+			.coeff = 0,
+			.mono_list = MonoListAddMono(p->mono_list, m)
+		};
 	}
 }
 
