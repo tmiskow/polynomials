@@ -11,6 +11,16 @@
 // Funkcje pomocnicze
 
 /**
+ * Sprawdza, czy jednomian jest tożsamościowo równy zeru.
+ * @param[in] m : jednomian
+ * @return Czy jednomian jest równy zero?
+ */
+ static bool MonoIsZero(const Mono *m)
+ {
+	 return PolyIsZero(&(m->p));
+ }
+
+/**
  * Rekurencyjnie usuwa z pamięci jednomiany znajdujące się w liście.
  * @param[in] m : pierwszy jednomian w liście
  */
@@ -73,8 +83,17 @@ static Mono* MonoListAddMono(Mono* mono_list, const Mono* m)
 		if (temp_pointer->exp == m->exp)
 		{
 			*new_mono = MonoAdd(temp_pointer, m);
-			new_mono->next = temp_pointer->next;
-			return new_mono;
+
+			if (MonoIsZero(new_mono))
+			{
+				return temp_pointer->next;
+			}
+
+			else
+			{
+				new_mono->next = temp_pointer->next;
+				return new_mono;
+			}
 		}
 
 		else if (temp_pointer->exp > m->exp)
@@ -110,8 +129,17 @@ static Mono* MonoListAddMono(Mono* mono_list, const Mono* m)
 			else if ((temp_pointer->next)->exp == m->exp)
 			{
 				*new_mono = MonoAdd(temp_pointer->next, m);
-				new_mono->next = (temp_pointer->next)->next;
-				temp_pointer->next = new_mono;
+
+				if (MonoIsZero(new_mono))
+				{
+					temp_pointer->next = (temp_pointer->next)->next;;
+				}
+
+				else
+				{
+					new_mono->next = (temp_pointer->next)->next;
+					temp_pointer->next = new_mono;
+				}
 			}
 
 			else
