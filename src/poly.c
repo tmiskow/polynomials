@@ -44,6 +44,99 @@ Mono* MonoListClone(const Mono *m)
 	}
 }
 
+/**
+ * Dodaje dwa jednomiany posiadające te same wykładniki.
+ * @param[in] m : jednomian
+ * @param[in] n : jednomian
+ * @return `m + n`
+ */
+static inline Mono MonoAdd(const Mono* m, const Mono* n)
+{
+	assert(m->exp == n->exp);
+	return (Mono) {.exp = m->exp, .p = PolyAdd(&(m->p), &(n->p)), .next = NULL};
+}
+
+/**
+ * Wstawia jednomian na odpowiednie miejsce w liście.
+ * @param[in] mono_list : wskaźnik na listę
+ * @param[in] m : jednomian
+ */
+static void MonoListAddMono(Mono** mono_list, const Mono* m)
+{
+	Mono* new_mono = (Mono*) malloc(sizeof (Mono));
+
+	if (*mono_list)
+	{
+		Mono* temp_pointer = *mono_list;
+
+		if (temp_pointer->exp == m->exp)
+		{
+			*new_mono = MonoAdd(temp_pointer, m);
+			new_mono->next = temp_pointer->next;
+			*mono_list = new_mono;
+		}
+
+		else if (temp_pointer->exp > m->exp)
+		{
+			*new_mono = (Mono)
+			{
+				.exp = m->exp,
+				.p = m->p,
+				.next = temp_pointer
+			};
+			*mono_list = new_mono;
+		}
+
+		else
+		{
+			// Znajdź w liście ostatni jednomian o mniejszym wykładniku.
+			while (temp_pointer->next && (temp_pointer->next)->exp < m->exp)
+			{
+				temp_pointer = temp_pointer->next;
+			}
+
+			if (temp_pointer->next == NULL)
+			{
+				*new_mono = (Mono)
+				{
+					.exp = m->exp,
+					.p = m->p,
+					.next = NULL
+				};
+				temp_pointer->next = new_mono;
+			}
+
+			else if ((temp_pointer->next)->exp == m->exp)
+			{
+				*new_mono = MonoAdd(temp_pointer->next, m);
+				new_mono->next = (temp_pointer->next)->next;
+				temp_pointer->next = new_mono;
+			}
+
+			else
+			{
+				*new_mono = (Mono)
+				{
+					.exp = m->exp,
+					.p = m->p,
+					.next = (temp_pointer->next)->next
+				};
+				temp_pointer->next = new_mono;
+			}
+		}
+	}
+
+	else
+	{
+		*new_mono = (Mono)
+		{
+			.exp = m->exp,
+			.p = m->p,
+			.next = NULL
+		};
+		*mono_list = new_mono;
+	}
+}
 
 // Funkcje główne
 
