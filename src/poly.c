@@ -274,3 +274,15 @@ Poly PolyAdd(const Poly *p, const Poly *q)
 		return new_poly;
 	}
 }
+
+Poly PolyAddMonos(unsigned count, const Mono monos[])
+{
+	Mono* mono_list = NULL;
+
+	for (unsigned i = 0; i < count; i++)
+	{
+		mono_list = MonoListAddMono(mono_list, &(monos[i]));
+	}
+
+	return (Poly) {.mono_list = mono_list, .coeff = 0};
+}
