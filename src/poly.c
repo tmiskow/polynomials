@@ -367,3 +367,54 @@ Poly PolyAddMonos(unsigned count, const Mono monos[])
 
 	return (Poly) {.mono_list = mono_list, .coeff = 0};
 }
+
+Poly PolyMul(const Poly *p, const Poly *q)
+{
+	if (PolyIsZero(p) || PolyIsZero(q))
+	{
+		return PolyZero();
+	}
+
+	else if (PolyIsCoeff(p) && PolyIsCoeff(q))
+	{
+		return PolyFromCoeff((p->coeff) * (q->coeff));
+	}
+
+	else if (PolyIsCoeff(p))
+	{
+		Poly temp_poly = PolyClone(p);
+		Mono temp_mono = MonoFromPoly(&temp_poly, 0);
+		return PolyMulByMono(q, &temp_mono);
+	}
+
+	else if (PolyIsCoeff(q))
+	{
+		return PolyMul(q, p);
+	}
+
+	else
+	{
+		Poly new_poly = PolyZero();
+		Mono* temp_pointer = q->mono_list;
+
+		while (temp_pointer)
+		{
+			Poly temp_poly = PolyMulByMono(p, temp_pointer);
+			new_poly = PolyAdd(&new_poly, &temp_poly);
+		}
+
+		return new_poly;
+	}
+}
+
+Poly PolyNeg(const Poly *p)
+{
+	Poly temp_poly = PolyFromCoeff(-1);
+	return PolyMul(&temp_poly, p);
+}
+
+Poly PolySub(const Poly *p, const Poly *q)
+{
+	Poly neg_q = PolyNeg(q);
+	return PolyAdd(p, &neg_q);
+}
