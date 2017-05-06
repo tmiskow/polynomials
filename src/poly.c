@@ -241,3 +241,36 @@ Mono MonoClone(const Mono *m)
 		.next = MonoListClone(m->next)
 	};
 }
+
+Poly PolyAdd(const Poly *p, const Poly *q)
+{
+	if (PolyIsCoeff(p) && PolyIsCoeff(q))
+	{
+		return (Poly) {.mono_list = NULL, .coeff = p->coeff + q->coeff};
+	}
+
+	else if (PolyIsCoeff(p))
+	{
+		Mono temp_mono = MonoFromPoly(p, 0);
+		return PolyAddMono(q, &temp_mono);
+	}
+
+	else if (PolyIsCoeff(q))
+	{
+		Mono temp_mono = MonoFromPoly(q, 0);
+		return PolyAddMono(p, &temp_mono);
+	}
+
+	else
+	{
+		Poly new_poly = PolyClone(p);
+		Mono* temp_pointer = q->mono_list;
+
+		while (temp_pointer)
+		{
+			new_poly = PolyAddMono(&new_poly, temp_pointer);
+		}
+
+		return new_poly;
+	}
+}
