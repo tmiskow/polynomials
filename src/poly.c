@@ -14,7 +14,7 @@
  * Rekurencyjnie usuwa z pamięci jednomiany znajdujące się w liście.
  * @param[in] m : pierwszy jednomian w liście
  */
-void MonoListDestroy(Mono *m)
+static void MonoListDestroy(Mono *m)
 {
 	if (m)
 	{
@@ -28,7 +28,7 @@ void MonoListDestroy(Mono *m)
  * @param[in] m : pierwszy jednomian w liście
  * @return sklonowana lista jednomianów
  */
-Mono* MonoListClone(const Mono *m)
+static Mono* MonoListClone(const Mono *m)
 {
 	if (m)
 	{
@@ -137,6 +137,8 @@ static void MonoListAddMono(Mono** mono_list, const Mono* m)
 		*mono_list = new_mono;
 	}
 }
+
+
 
 // Funkcje główne
 
