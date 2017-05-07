@@ -296,6 +296,86 @@ static Poly PolyMulByMono(const Poly *p, const Mono *m)
 	}
 }
 
+/**
+ * Zwraca najwyższy wykładnik na liście jednomianów (-1 dla pustej listy).
+ * @param[in] mono_list : pierwszy jednomian w liście
+ * @return : wykładnik ostatniego wielomianu na liście
+ */
+static poly_exp_t MonoListHighestExp(Mono *mono_list)
+{
+	if (mono_list)
+	{
+		Mono* temp_pointer = mono_list;
+		while(temp_pointer->next)
+		{
+			temp_pointer = temp_pointer->next;
+		}
+		return temp_pointer->exp;
+	}
+
+	else
+	{
+		return -1;
+	}
+}
+
+/**
+ * Sprawdza równość dwóch jednomianów.
+ * @param[in] m : jednomian
+ * @param[in] n : jednomian
+ * @return `m = n`
+ */
+static bool MonoIsEq(const Mono *m, const Mono *n)
+{
+	return (m->exp == n->exp && PolyIsEq(&(m->p), &(n->p)));
+}
+
+/**
+ * Sprawdza równość dwóch list jednomianów.
+ * @param[in] mono_list_1 : jednomian
+ * @param[in] mono_list_2 : jednomian
+ * @return `mono_list_1 = mono_list_2`
+ */
+static bool MonoListIsEq(const Mono *mono_list_1, Mono *mono_list_2)
+ {
+ 	if (mono_list_1 && mono_list_2)
+	{
+		return	MonoListIsEq(mono_list_1->next, mono_list_2->next) &&
+				MonoIsEq(mono_list_1, mono_list_2);
+	}
+
+	else if (mono_list_1 || mono_list_2)
+	{
+		return false;
+	}
+
+	else
+	{
+		return true;
+	}
+ }
+
+ /**
+  * Wylicza wartość jednomianu w punkcie @p x.
+  * Wstawia pod pierwszą zmienną jednomianu wartość @p x.
+  * Podnosi @p x do odpowiedniej potęgi i wymnaża wielomian o tę liczbę.
+  * @param[in] m : jednomian
+  * @param[in] x : argument
+  * @return wielomian
+  */
+static Poly MonoAt(const Mono *m, poly_coeff_t x)
+{
+	poly_coeff_t x_pow = 1;
+
+	for (unsigned i = 0; i < m->exp; i++)
+	{
+		x_pow *= x;
+	}
+
+	Poly temp_poly = PolyFromCoeff(x_pow);
+	return PolyMul(&(m->p), &temp_poly);
+}
+
 // Funkcje główne
 
 void PolyDestroy(Poly *p)
@@ -417,4 +497,79 @@ Poly PolySub(const Poly *p, const Poly *q)
 {
 	Poly neg_q = PolyNeg(q);
 	return PolyAdd(p, &neg_q);
+}
+
+poly_exp_t PolyDegBy(const Poly *p, unsigned var_idx)
+{
+	if (var_idx == 0)
+	{
+		return MonoListHighestExp(p->mono_list);
+	}
+
+	else
+	{
+		Mono* temp_pointer = p->mono_list;
+		poly_exp_t max_exp = -1;
+
+		while (temp_pointer)
+		{
+			poly_exp_t temp_exp = PolyDegBy(&(temp_pointer->p), var_idx - 1);
+			max_exp = max_exp > temp_exp ? max_exp : temp_exp;
+		}
+
+		return max_exp;
+	}
+}
+
+poly_exp_t PolyDeg(const Poly *p)
+{
+	if (PolyIsCoeff(p))
+	{
+		return -1;
+	}
+
+	unsigned i = 0;
+	poly_exp_t last_deg = 0;
+	poly_exp_t deg = 0;
+	while (last_deg != -1)
+	{
+		last_deg = PolyDegBy(p, i);
+		deg += last_deg;
+		i++;
+	}
+
+	return deg + 1;
+}
+
+bool PolyIsEq(const Poly *p, const Poly *q)
+{
+	if (PolyIsCoeff(p) && PolyIsCoeff(q))
+	{
+		return (p->coeff == q->coeff);
+	}
+
+	else if (PolyIsCoeff(p) || PolyIsCoeff(q))
+	{
+		return false;
+	}
+
+	else
+	{
+		return MonoListIsEq(p->mono_list, q->mono_list);
+	}
+}
+
+Poly PolyAt(const Poly *p, poly_coeff_t x)
+{
+	Poly new_poly = PolyZero();
+	Mono* temp_pointer = p->mono_list;
+
+	while(temp_pointer)
+	{
+		Poly temp_poly = MonoAt(temp_pointer, x);
+		new_poly = PolyAdd(&new_poly, &temp_poly);
+		temp_pointer = temp_pointer->next;
+	}
+
+	return new_poly;
 }
