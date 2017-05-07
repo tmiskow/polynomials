@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 /** Typ współczynników wielomianu */
 typedef long poly_coeff_t;
@@ -18,14 +19,18 @@ typedef long poly_coeff_t;
 /** Typ wykładników wielomianu */
 typedef int poly_exp_t;
 
+typedef struct Poly Poly;
+typedef struct Mono Mono;
+
 /**
  * Struktura przechowująca wielomian
  * TODO
  */
-typedef struct Poly
+struct Poly
 {
-    /* TODO */
-} Poly;
+    Mono* mono_list;
+	poly_coeff_t coeff;
+};
 
 /**
   * Struktura przechowująca jednomian
@@ -33,12 +38,12 @@ typedef struct Poly
   * Współczynnik `p` może też być wielomianem.
   * Będzie on traktowany jako wielomian nad kolejną zmienną (nie nad x).
   */
-typedef struct Mono
+struct Mono
 {
-    Poly p; ///< współczynnik
+    Poly poly; ///< współczynnik
     poly_exp_t exp; ///< wykładnik
-    /* TODO */
-} Mono;
+    Mono* next;
+};
 
 /**
  * Tworzy wielomian, który jest współczynnikiem.
@@ -47,7 +52,7 @@ typedef struct Mono
  */
 static inline Poly PolyFromCoeff(poly_coeff_t c)
 {
-    /* TODO */
+    return (Poly) {.mono_list = NULL, .coeff = c};
 }
 
 /**
@@ -56,7 +61,7 @@ static inline Poly PolyFromCoeff(poly_coeff_t c)
  */
 static inline Poly PolyZero()
 {
-    /* TODO */
+    return PolyFromCoeff(0);
 }
 
 /**
@@ -68,7 +73,7 @@ static inline Poly PolyZero()
  */
 static inline Mono MonoFromPoly(const Poly *p, poly_exp_t e)
 {
-    return (Mono) {.p = *p, .exp = e};
+    return (Mono) {.poly = *p, .exp = e, .next = NULL};
 }
 
 /**
@@ -78,7 +83,7 @@ static inline Mono MonoFromPoly(const Poly *p, poly_exp_t e)
  */
 static inline bool PolyIsCoeff(const Poly *p)
 {
-    /* TODO */
+    return p->mono_list == NULL;
 }
 
 /**
@@ -88,7 +93,7 @@ static inline bool PolyIsCoeff(const Poly *p)
  */
 static inline bool PolyIsZero(const Poly *p)
 {
-    /* TODO */
+    return PolyIsCoeff(p) && p->coeff == 0;
 }
 
 /**
@@ -103,7 +108,11 @@ void PolyDestroy(Poly *p);
  */
 static inline void MonoDestroy(Mono *m)
 {
-    /* TODO */
+    PolyDestroy(&(m->poly));
+
+	// DEBUG
+	m->next = NULL;
+	m->exp = 0;
 }
 
 /**
@@ -120,7 +129,7 @@ Poly PolyClone(const Poly *p);
  */
 static inline Mono MonoClone(const Mono *m)
 {
-    /* TODO */
+    return (Mono) {.poly = PolyClone(&(m->poly)), .exp = m->exp, .next = NULL};
 }
 
 /**
