@@ -24,10 +24,7 @@ typedef int poly_exp_t;
  * Struktura przechowująca wielomian
  * TODO
  */
-typedef struct Poly
-{
-    /* TODO */
-} Poly;
+typedef struct Poly Poly;
 
 /**
   * Struktura przechowująca jednomian
@@ -35,12 +32,7 @@ typedef struct Poly
   * Współczynnik `p` może też być wielomianem.
   * Będzie on traktowany jako wielomian nad kolejną zmienną (nie nad x).
   */
-typedef struct Mono
-{
-    Poly p; ///< współczynnik
-    poly_exp_t exp; ///< wykładnik
-    /* TODO */
-} Mono;
+typedef struct Mono Mono;
 
 /**
  * Tworzy wielomian, który jest współczynnikiem.

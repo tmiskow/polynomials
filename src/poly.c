@@ -1,5 +1,20 @@
 #include "poly.h"
 
+// Struktury
+
+struct Poly
+{
+	Mono **monos; ///< wskaźnik do tablicy jednomianów
+	unsigned count; ///< liczba jednomianów w @monos
+	poly_coeff_t coeff; ///< współczynnik liczbowy
+};
+
+struct Mono
+{
+    Poly p; ///< współczynnik
+    poly_exp_t exp; ///< wykładnik
+};
+
 // Główne funkcje biblioteki
 
 void PolyDestroy(Poly *p)
