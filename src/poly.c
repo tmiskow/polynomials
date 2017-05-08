@@ -111,6 +111,11 @@ static void PolyInsertMono(Poly *p, Mono *m)
 	}
 }
 
+bool MonoIsEq(const Mono *m, const Mono *n)
+{
+	return m->exp == n->exp && PolyIsEq(&(m->poly), &(n->poly));
+}
+
 // Funkcje główne
 
 void PolyDestroy(Poly *p)
@@ -168,4 +173,84 @@ Poly PolyAdd(const Poly *p, const Poly *q)
 
 		return poly_clone;
 	}
+}
+
+Poly PolyAddMonos(unsigned count, const Mono monos[])
+{
+	Poly new_poly = PolyZero();
+
+	for (int i = 0; i < count; i++)
+	{
+		Mono temp_mono = monos[i];
+		PolyInsertMono(&new_poly, &temp_mono);
+	}
+
+	return new_poly;
+}
+
+bool PolyIsEq(const Poly *p, const Poly *q)
+{
+	if (PolyIsCoeff(p) && PolyIsCoeff(q))
+	{
+		return p->coeff == q->coeff;
+	}
+
+	else if (PolyIsCoeff(q) || PolyIsCoeff(q))
+	{
+		return false;
+	}
+
+	else
+	{
+		Mono *temp_pointer_p = p->mono_list;
+		Mono *temp_pointer_q = q->mono_list;
+
+		while (temp_pointer_p && temp_pointer_q)
+		{
+			if (!MonoIsEq(temp_pointer_p, temp_pointer_q))
+			{
+				return false;
+			}
+		}
+
+		return temp_pointer_p && temp_pointer_q;
+	}
+}
+
+// Placeholdery
+
+Poly PolyMul(const Poly *p, const Poly *q)
+{
+	assert(false);
+	return PolyZero();
+}
+
+Poly PolyNeg(const Poly *p)
+{
+	assert(false);
+	return PolyZero();
+}
+
+Poly PolySub(const Poly *p, const Poly *q)
+{
+	assert(false);
+	return PolyZero();
+}
+
+poly_exp_t PolyDegBy(const Poly *p, unsigned var_idx)
+{
+	assert(false);
+	return 0;
+}
+
+poly_exp_t PolyDeg(const Poly *p)
+{
+	assert(false);
+	return 0;
+}
+
+Poly PolyAt(const Poly *p, poly_coeff_t x)
+{
+	assert(false);
+	return PolyZero();
 }
