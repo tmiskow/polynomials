@@ -20,19 +20,31 @@ typedef long poly_coeff_t;
 /** Typ wykładników wielomianu */
 typedef int poly_exp_t;
 
-/**
- * Struktura przechowująca wielomian
- * TODO
- */
 typedef struct Poly Poly;
+typedef struct Mono Mono;
 
 /**
-  * Struktura przechowująca jednomian
+ * Struktura przechowująca wielomian.
+ * TODO
+ */
+struct Poly
+{
+	Mono **monos; ///< wskaźnik do tablicy jednomianów
+	unsigned count; ///< liczba jednomianów w @monos
+	poly_coeff_t coeff; ///< współczynnik liczbowy
+};
+
+/**
+  * Struktura przechowująca jednomian.
   * Jednomian ma postać `p * x^e`.
   * Współczynnik `p` może też być wielomianem.
   * Będzie on traktowany jako wielomian nad kolejną zmienną (nie nad x).
   */
-typedef struct Mono Mono;
+struct Mono
+{
+    Poly p; ///< współczynnik
+    poly_exp_t exp; ///< wykładnik
+};
 
 /**
  * Tworzy wielomian, który jest współczynnikiem.
@@ -41,7 +53,7 @@ typedef struct Mono Mono;
  */
 static inline Poly PolyFromCoeff(poly_coeff_t c)
 {
-    /* TODO */
+    return (Poly) {.monos = NULL, .count = 0, .coeff = c};
 }
 
 /**
@@ -50,7 +62,7 @@ static inline Poly PolyFromCoeff(poly_coeff_t c)
  */
 static inline Poly PolyZero()
 {
-    /* TODO */
+    return PolyFromCoeff(0);
 }
 
 /**
@@ -72,7 +84,7 @@ static inline Mono MonoFromPoly(const Poly *p, poly_exp_t e)
  */
 static inline bool PolyIsCoeff(const Poly *p)
 {
-    /* TODO */
+    return (p->count == 0);
 }
 
 /**
@@ -82,7 +94,7 @@ static inline bool PolyIsCoeff(const Poly *p)
  */
 static inline bool PolyIsZero(const Poly *p)
 {
-    /* TODO */
+    return PolyIsCoeff(p) && (p->coeff == 0);
 }
 
 /**
@@ -97,7 +109,7 @@ void PolyDestroy(Poly *p);
  */
 static inline void MonoDestroy(Mono *m)
 {
-    /* TODO */
+    PolyDestroy(&(m->p));
 }
 
 /**
@@ -114,7 +126,7 @@ Poly PolyClone(const Poly *p);
  */
 static inline Mono MonoClone(const Mono *m)
 {
-    /* TODO */
+    return (Mono) {.p = PolyClone(&(m->p)), .exp = m->exp};
 }
 
 /**
