@@ -9,8 +9,10 @@
 #ifndef __POLY_H__
 #define __POLY_H__
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 /** Typ współczynników wielomianu */
 typedef long poly_coeff_t;
