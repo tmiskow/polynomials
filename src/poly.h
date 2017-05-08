@@ -29,8 +29,8 @@ typedef struct Mono Mono;
  */
 struct Poly
 {
-	Mono **monos; ///< wskaźnik do tablicy jednomianów
-	unsigned count; ///< liczba jednomianów w @monos
+	Mono* monos; ///< tablica jednomianów
+	unsigned count; ///< liczba jednomianów w @p monos
 	poly_coeff_t coeff; ///< współczynnik liczbowy
 };
 
