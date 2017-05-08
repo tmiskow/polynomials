@@ -1,6 +1,25 @@
 #include "poly.h"
 
-// Struktury
+// Pomocnicze funkcje
+
+static Mono* MonoCreateArray(unsigned count)
+{
+	Mono* monos = (Mono*) malloc(count * sizeof(Mono));
+	assert(monos);
+	return monos;
+}
+
+static Mono* MonoCloneArray(unsigned count, const Mono monos[])
+{
+	Mono* monos_clone = MonoCreateArray(count);
+
+	for (unsigned i = 0; i < count; i++)
+	{
+		monos_clone[i] = MonoClone(&(monos[i]));
+	}
+
+	return monos_clone;
+}
 
 // Główne funkcje biblioteki
 
@@ -12,9 +31,20 @@ void PolyDestroy(Poly *p)
 
 Poly PolyClone(const Poly *p)
 {
-	/* TODO */
-	assert(false);
-	return PolyZero();
+	if (PolyIsCoeff(p))
+	{
+		return PolyFromCoeff(p->coeff);
+	}
+
+	else
+	{
+		return (Poly)
+		{
+			.monos = MonoCloneArray(p->count, p->monos),
+			.count = p->count,
+			.coeff = 0
+		};
+	}
 }
 
 Poly PolyAdd(const Poly *p, const Poly *q)
