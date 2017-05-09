@@ -217,7 +217,9 @@ static Mono* MonoOptimizedArray(unsigned count, const Mono monos[], unsigned *ne
 {
 	Mono* sorted_monos = MonoSortArrayByExp(count, monos);
 	MonoArrayReduceLikeTerms(count, sorted_monos);
-	return MonoArrayReduceZeroTerms(count, sorted_monos, new_count);
+	Mono* new_monos = MonoArrayReduceZeroTerms(count, sorted_monos, new_count);
+	free(sorted_monos);
+	return new_monos;
 }
 
 // Główne funkcje biblioteki
@@ -261,7 +263,7 @@ Poly PolyAdd(const Poly *p, const Poly *q)
 
 		for (unsigned i = 1; i < new_count; i++)
 		{
-			new_monos[i] = MonoClone(&(p->monos[i]));
+			new_monos[i] = MonoClone(&(p->monos[i-1]));
 		}
 
 		Poly new_poly = PolyAddMonos(new_count, new_monos);
