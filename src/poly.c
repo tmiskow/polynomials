@@ -115,7 +115,7 @@ static unsigned MonoArrayPartition(unsigned left, unsigned right, Mono monos[])
 	}
 }
 
-void MonoQuickSortArrayByExp(unsigned left, unsigned right, Mono monos[])
+static void MonoQuickSortArrayByExp(unsigned left, unsigned right, Mono monos[])
 {
 	if (left < right)
 	{
@@ -221,6 +221,64 @@ static Mono* MonoOptimizedArray(unsigned count, const Mono monos[], unsigned *ne
 	free(sorted_monos);
 	return new_monos;
 }
+
+static Mono MonoMul(const Mono *m, const Mono *n)
+{
+	if (MonoIsZero(m) || MonoIsZero(n))
+	{
+		return MonoZero();
+	}
+
+	else
+	{
+		Poly new_poly = PolyMul(&(m->p), &(n->p));
+
+		if (PolyIsZero(&new_poly))
+		{
+			return MonoZero();
+		}
+
+		else
+		{
+			return (Mono) {.p = new_poly, .exp = m->exp + n->exp};
+		}
+	}
+}
+
+static Poly PolyMulByMono(const Poly *p, const Mono *m)
+{
+	if (PolyIsZero(p) || MonoIsZero(m))
+	{
+		return PolyZero();
+	}
+
+	else if (PolyIsCoeff(p) && MonoIsConst(m))
+	{
+		poly_coeff_t new_coeff = ((m->p).coeff) * p->coeff;
+		return PolyFromCoeff(new_coeff);
+	}
+
+	else if (PolyIsCoeff(p))
+	{
+		Mono temp_monos[1];
+		temp_monos[0] = (Mono) {.p = PolyMul(p, &(m->p)), .exp = m->exp};
+		return PolyAddMonos(1, temp_monos);
+	}
+
+	else
+	{
+		unsigned new_count = p->count;
+		Mono* new_monos = MonoCreateArray(new_count);
+
+		for (unsigned i = 0; i < new_count; i++)
+		{
+			new_monos[i] = MonoMul(m, &(p->monos[i]));
+		}
+
+		return (Poly) {.monos = new_monos, .count = new_count, .coeff = 0};
+	}
+}
+
 
 // Główne funkcje biblioteki
 
@@ -328,9 +386,58 @@ Poly PolyAddMonos(unsigned count, const Mono monos[])
 
 Poly PolyMul(const Poly *p, const Poly *q)
 {
-	/* TODO */
-	assert(false);
-	return PolyZero();
+	if (PolyIsZero(p) || PolyIsZero(q))
+	{
+		return PolyZero();
+	}
+
+	else if (PolyIsCoeff(p) && PolyIsCoeff(q))
+	{
+		return PolyFromCoeff((p->coeff)*(q->coeff));
+	}
+
+	else if (PolyIsCoeff(q))
+	{
+		unsigned new_count = p->count;
+		Mono* new_monos = MonoCreateArray(new_count);
+
+		for (unsigned i = 0; i < new_count; i++)
+		{
+			Mono temp_mono = p->monos[i];
+			Poly temp_poly = temp_mono.p;
+			new_monos[i] = (Mono)
+			{
+				.p = PolyMul(&temp_poly, q),
+				.exp = temp_mono.exp
+			};
+		}
+
+		return (Poly) {.monos = new_monos, .count = new_count, .coeff = 0};
+	}
+
+	else if (PolyIsCoeff(p))
+	{
+		return PolyMul(q, p);
+	}
+
+	else
+	{
+		Poly new_poly = PolyZero();
+
+		for (unsigned i = 0; i < q->count; i++)
+		{
+			Mono temp_mono = q->monos[i];
+			Poly mul_poly = PolyMulByMono(p, &temp_mono);
+			Poly temp_poly = PolyAdd(&new_poly, &mul_poly);
+
+			PolyDestroy(&mul_poly);
+			PolyDestroy(&new_poly);
+
+			new_poly = temp_poly;
+		}
+
+		return new_poly;
+	}
 }
 
 Poly PolyNeg(const Poly *p)
