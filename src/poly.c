@@ -279,6 +279,28 @@ static Poly PolyMulByMono(const Poly *p, const Mono *m)
 	}
 }
 
+Poly PolyCoeffFromMonoExp(const Mono *m, poly_coeff_t x)
+{
+
+	poly_coeff_t result = 1;
+	poly_exp_t temp_exp = m->exp;
+
+	while (temp_exp)
+    {
+        if (temp_exp & 1)
+            result *= x;
+        temp_exp >>= 1;
+        x *= x;
+    }
+
+    return PolyFromCoeff(result);
+}
+
+static Poly MonoAt(const Mono *m, poly_coeff_t x)
+{
+	Poly temp_poly = PolyCoeffFromMonoExp(m, x);
+	return PolyMul(&(m->p), &temp_poly);
+}
 
 // Główne funkcje biblioteki
 
@@ -560,7 +582,23 @@ bool PolyIsEq(const Poly *p, const Poly *q)
 
 Poly PolyAt(const Poly *p, poly_coeff_t x)
 {
-	/* TODO */
-	assert(false);
-	return PolyZero();
+	if (PolyIsCoeff(p))
+	{
+		return PolyFromCoeff(p->coeff);
+	}
+
+	else
+	{
+		Poly new_poly = PolyZero();
+
+		for (unsigned i = 0; i < p->count; i++)
+		{
+			Poly mono_poly = MonoAt(&(p->monos[i]), x);
+			Poly temp_poly = PolyAdd(&new_poly, &mono_poly);
+			PolyDestroy(&new_poly);
+			new_poly = temp_poly;
+		}
+
+		return new_poly;
+	}
 }
