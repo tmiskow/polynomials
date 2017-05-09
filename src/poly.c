@@ -14,7 +14,7 @@ static bool MonoIsZero(const Mono *m)
 
 static bool MonoIsConst(const Mono *m)
 {
-	return PolyIsCoeff(&(m->p));
+	return PolyIsCoeff(&(m->p)) && m->exp == 0;
 }
 
 static bool MonoIsEq(const Mono *m, const Mono *n)
@@ -442,16 +442,16 @@ Poly PolyMul(const Poly *p, const Poly *q)
 
 Poly PolyNeg(const Poly *p)
 {
-	/* TODO */
-	assert(false);
-	return PolyZero();
+	Poly temp_poly = PolyFromCoeff(-1);
+	return PolyMul(p, &temp_poly);
 }
 
 Poly PolySub(const Poly *p, const Poly *q)
 {
-	/* TODO */
-	assert(false);
-	return PolyZero();
+	Poly temp_poly = PolyNeg(q);
+	Poly new_poly = PolyAdd(p, &temp_poly);
+	PolyDestroy(&temp_poly);
+	return new_poly;
 }
 
 poly_exp_t PolyDegBy(const Poly *p, unsigned var_idx)
