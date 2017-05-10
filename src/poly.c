@@ -68,71 +68,19 @@ static Mono* MonoCopyArray(unsigned count, const Mono monos[])
 	return monos_copy;
 }
 
-static void MonoArraySwap(unsigned index1, unsigned index2, Mono monos[])
-{
-	if (index1 != index2)
-	{
-		Mono temp_mono = monos[index1];
-		monos[index1] = monos[index2];
-		monos[index2] = temp_mono;
-	}
-}
-
-static unsigned MonoArrayPartition(unsigned left, unsigned right, Mono monos[])
-{
-	poly_exp_t pivot_exp = monos[left].exp;
-    unsigned i = left + 1;
-	unsigned j = right;
-
-	while (i < j)
-	{
-		while (i < j && monos[i].exp <= pivot_exp)
-		{
-			i++;
-		}
-
-		while (i < j && monos[j].exp >= pivot_exp)
-		{
-			j--;
-		}
-
-		if (i < j)
-		{
-			MonoArraySwap(i, j, monos);
-		}
-    }
-
-	if (monos[i].exp < pivot_exp)
-	{
-		MonoArraySwap(left, i, monos);
-		return i;
-	}
-
-	else
-	{
-		MonoArraySwap(left, i - 1, monos);
-		return i - 1;
-	}
-}
-
-static void MonoQuickSortArrayByExp(unsigned left, unsigned right, Mono monos[])
-{
-	if (left < right)
-	{
-		unsigned partition_point = MonoArrayPartition(left, right, monos);
-		if (partition_point)
-		{
-			MonoQuickSortArrayByExp(left, partition_point - 1, monos);
-		}
-		MonoQuickSortArrayByExp(partition_point + 1, right, monos);
-	}
-}
-
 static Mono MonoAdd(const Mono *m, const Mono *n)
 {
 	assert(m->exp == n->exp);
 
 	return (Mono) {.p = PolyAdd(&(m->p), &(n->p)), .exp = m->exp};
+}
+
+static int MonoCompareByExp(const void *m, const void *n)
+{
+	poly_exp_t m_exp = ((Mono*) m)->exp;
+	poly_exp_t n_exp = ((Mono*) n)->exp;
+
+	return (m_exp - n_exp);
 }
 
 /*
@@ -142,7 +90,7 @@ static Mono MonoAdd(const Mono *m, const Mono *n)
 static Mono* MonoSortArrayByExp(unsigned count, const Mono monos[])
 {
 	Mono* new_monos = MonoCopyArray(count, monos);
-	MonoQuickSortArrayByExp(0, count - 1, new_monos);
+	qsort(new_monos, count, sizeof (Mono), MonoCompareByExp);
 	return new_monos;
 }
 
