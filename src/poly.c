@@ -454,7 +454,16 @@ Poly PolyMul(const Poly *p, const Poly *q)
 			};
 		}
 
-		return (Poly) {.monos = new_monos, .count = new_count, .coeff = 0};
+		if (new_count == 1 && MonoIsZero(new_monos))
+		{
+			free(new_monos);
+			return PolyZero();
+		}
+
+		else
+		{
+			return (Poly) {.monos = new_monos, .count = new_count, .coeff = 0};
+		}
 	}
 
 	else if (PolyIsCoeff(p))
@@ -477,6 +486,8 @@ Poly PolyMul(const Poly *p, const Poly *q)
 
 			new_poly = temp_poly;
 		}
+
+
 
 		return new_poly;
 	}
