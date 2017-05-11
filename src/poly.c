@@ -75,6 +75,80 @@ static Mono MonoAdd(const Mono *m, const Mono *n)
 	return (Mono) {.p = PolyAdd(&(m->p), &(n->p)), .exp = m->exp};
 }
 
+/*
+ * TODO
+ * Przejmuje na własność wielomiany @p p i @p q.
+ */
+static Poly PolyMerge(const Poly *p, const Poly *q)
+{
+	if (PolyIsCoeff(p) && PolyIsCoeff(q))
+	{
+		return PolyAdd(p, q);
+	}
+
+	else if (PolyIsCoeff(q))
+	{
+		unsigned new_count = p->count + 1;
+		Mono* new_monos = MonoCreateArray(new_count);
+
+		new_monos[0] = MonoFromPoly(q, 0);
+
+		for (unsigned i = 1; i < new_count; i++)
+		{
+			new_monos[i] = p->monos[i-1];
+		}
+
+		Poly new_poly = PolyAddMonos(new_count, new_monos);
+		free(new_monos);
+		free(p->monos);
+		return new_poly;
+	}
+
+	else if (PolyIsCoeff(p))
+	{
+		return PolyMerge(q, p);
+	}
+
+	else
+	{
+		unsigned new_count = p->count + q->count;
+		Mono* new_monos = MonoCreateArray(new_count);
+
+		unsigned i = 0;
+
+		while (i < p->count)
+		{
+			new_monos[i] = p->monos[i];
+			p->monos[i] = MonoZero();
+			i++;
+		}
+
+		while (i < new_count)
+		{
+			new_monos[i] = q->monos[i - p->count];
+			q->monos[i - p->count] = MonoZero();
+			i++;
+		}
+
+		Poly new_poly = PolyAddMonos(new_count, new_monos);
+		free(new_monos);
+		free(p->monos);
+		free(q->monos);
+
+		return new_poly;
+	}
+}
+
+/*
+ * TODO
+ * Przejmuje na własność jednomiany @p m i @p n.
+ */
+static Mono MonoMerge(const Mono *m, const Mono *n)
+{
+	assert(m->exp == n->exp);
+	return (Mono) {.p = PolyMerge(&(m->p), &(n->p)), .exp = m->exp};
+}
+
 static int MonoCompareByExp(const void *m, const void *n)
 {
 	poly_exp_t m_exp = ((Mono*) m)->exp;
@@ -104,9 +178,7 @@ static void MonoArrayReduceLikeTerms(unsigned count, Mono monos[])
 	{
 		if (monos[i].exp == monos[i+1].exp)
 		{
-			Mono new_mono = MonoAdd(&monos[i], &monos[i+1]);
-			MonoDestroy(&monos[i]);
-			MonoDestroy(&monos[i+1]);
+			Mono new_mono = MonoMerge(&monos[i], &monos[i+1]);
 			monos[i] = MonoZero();
 			monos[i+1] = new_mono;
 		}
@@ -426,14 +498,14 @@ Poly PolySub(const Poly *p, const Poly *q)
 
 poly_exp_t PolyDegBy(const Poly *p, unsigned var_idx)
 {
+	if (PolyIsZero(p))
+	{
+		return -1;
+	}
+
 	if (var_idx == 0)
 	{
-		if (PolyIsZero(p))
-		{
-			return -1;
-		}
-
-		else if (PolyIsCoeff(p))
+		if (PolyIsCoeff(p))
 		{
 			return 0;
 		}
@@ -544,6 +616,7 @@ Poly PolyAt(const Poly *p, poly_coeff_t x)
 			Poly mono_poly = MonoAt(&(p->monos[i]), x);
 			Poly temp_poly = PolyAdd(&new_poly, &mono_poly);
 			PolyDestroy(&new_poly);
+			PolyDestroy(&mono_poly);
 			new_poly = temp_poly;
 		}
 
