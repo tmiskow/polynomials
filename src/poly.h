@@ -1,9 +1,9 @@
 /** @file
    Interfejs klasy wielomianów
 
-   @author Jakub Pawlewicz <pan@mimuw.edu.pl>, TODO
+   @author Jakub Pawlewicz <pan@mimuw.edu.pl>, Tomasz Miśków <tm385898@students.mimuw.edu.pl>
    @copyright Uniwersytet Warszawski
-   @date 2017-04-24, TODO
+   @date 2017-04-24, 2017-05-12
 */
 
 #ifndef __POLY_H__
@@ -20,12 +20,16 @@ typedef long poly_coeff_t;
 /** Typ wykładników wielomianu */
 typedef int poly_exp_t;
 
+/** Definicja typu struktury wielomianu */
 typedef struct Poly Poly;
+
+/** Definicja typu struktury jednomianu */
 typedef struct Mono Mono;
 
 /**
  * Struktura przechowująca wielomian.
- * TODO
+ * Wielomian to tablica jednomianów.
+ * Jeżeli tablica jest pusta, to wielomian jest stały i ma wartość @p coeff.
  */
 struct Poly
 {

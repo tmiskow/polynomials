@@ -1,27 +1,58 @@
+/** @file
+   Implemnatcja funkcji z poly.h i statycznych funkcji pomocniczych
+
+   @author Tomasz Miśków <tm385898@students.mimuw.edu.pl>
+   @copyright Uniwersytet Warszawski
+   @date 2017-05-12
+*/
+
 #include "poly.h"
 
-// Pomocnicze funkcje
-
+/**
+ * Tworzy jednomian tożsamościowo równy zeru.
+ * @return jednomian
+ */
 static Mono MonoZero()
 {
 	return (Mono) {.p = PolyZero(), .exp = 0};
 }
 
+/**
+ * Sprawdza, czy jednomian jest tożsamościowo równy zeru.
+ * @param[in] m : jednomian
+ * @return Czy jednomian jest równy zero?
+ */
 static bool MonoIsZero(const Mono *m)
 {
 	return PolyIsZero(&(m->p));
 }
 
+/**
+ * Sprawdza, czy jednomian jest stały.
+ * @param[in] m : jednomian
+ * @return Czy jednomian jest współczynnikiem?
+ */
 static bool MonoIsConst(const Mono *m)
 {
 	return PolyIsCoeff(&(m->p)) && m->exp == 0;
 }
 
+/**
+ * Sprawdza równość dwóch jednomianów.
+ * @param[in] m : jednomian
+ * @param[in] n : jednomian
+ * @return `m = n`
+ */
 static bool MonoIsEq(const Mono *m, const Mono *n)
 {
 	return (m->exp == n->exp) && PolyIsEq(&(m->p), &(n->p));
 }
 
+/**
+ * Usuwa tablicę jednomianów z pamięci.
+ * @param[in] count : liczba jednomianów (rozmiar tablicy)
+ * @param[in] monos : tablica jednomianów
+ */
 static void MonoArrayDestroy(unsigned count, Mono monos[])
 {
 	for (unsigned i = 0; i < count; i++)
@@ -33,6 +64,11 @@ static void MonoArrayDestroy(unsigned count, Mono monos[])
 	free(monos);
 }
 
+/**
+ * Tworzy tablicę jednomianów.
+ * @param[in] count : liczba jednomianów (rozmiar tablicy)
+ * @return tablica jednomianów
+ */
 static Mono* MonoCreateArray(unsigned count)
 {
 	Mono* monos = (Mono*) malloc(count * sizeof(Mono));
@@ -40,6 +76,12 @@ static Mono* MonoCreateArray(unsigned count)
 	return monos;
 }
 
+/**
+ * Robi pełną, głęboką kopię tablicy jednomianów.
+ * @param[in] count : liczba jednomianów (rozmiar tablicy)
+ * @param[in] monos : tablica jednomianów
+ * @return skopiowana tablica
+ */
 static Mono* MonoCloneArray(unsigned count, const Mono monos[])
 {
 	Mono* monos_clone = MonoCreateArray(count);
@@ -52,9 +94,12 @@ static Mono* MonoCloneArray(unsigned count, const Mono monos[])
 	return monos_clone;
 }
 
-/*
- * TODO
+/**
+ * Robi płytką kopię tablicy jednomianów.
  * Przejmuje na własność zawartość tablicy @p monos.
+ * @param[in] count : liczba jednomianów (rozmiar tablicy)
+ * @param[in] monos : tablica jednomianów
+ * @return skopiowana tablica
  */
 static Mono* MonoCopyArray(unsigned count, const Mono monos[])
 {
@@ -68,6 +113,12 @@ static Mono* MonoCopyArray(unsigned count, const Mono monos[])
 	return monos_copy;
 }
 
+/**
+ * Dodaje dwa jednomiany.
+ * @param[in] m : jednomian
+ * @param[in] n : jednomian
+ * @return `m + n`
+ */
 static Mono MonoAdd(const Mono *m, const Mono *n)
 {
 	assert(m->exp == n->exp);
@@ -75,9 +126,12 @@ static Mono MonoAdd(const Mono *m, const Mono *n)
 	return (Mono) {.p = PolyAdd(&(m->p), &(n->p)), .exp = m->exp};
 }
 
-/*
- * TODO
+/**
+ * Łączy dwa wielomiany w jeden.
  * Przejmuje na własność wielomiany @p p i @p q.
+ * @param[in] p : wielomian
+ * @param[in] q : wielomian
+ * @return `p + q`
  */
 static Poly PolyMerge(const Poly *p, const Poly *q)
 {
@@ -139,9 +193,12 @@ static Poly PolyMerge(const Poly *p, const Poly *q)
 	}
 }
 
-/*
- * TODO
+/**
+ * Łączy dwa jednomiany w jeden.
  * Przejmuje na własność jednomiany @p m i @p n.
+ * @param[in] m : jednomian
+ * @param[in] n : jednomian
+ * @return `m + n`
  */
 static Mono MonoMerge(const Mono *m, const Mono *n)
 {
@@ -149,6 +206,14 @@ static Mono MonoMerge(const Mono *m, const Mono *n)
 	return (Mono) {.p = PolyMerge(&(m->p), &(n->p)), .exp = m->exp};
 }
 
+/**
+ * Porównuje dwa jednomiany pod względem wykładnika.
+ * @p MonoCompareByExp jest wykorzystywana jako komparator funkcji @p qsort.
+ * Z tego powodu musi przyjmować parametry `typu const void*`.
+ * @param[in] m : jednomian
+ * @param[in] n : jednomian
+ * @return różnicę wykładników jednomianów @p m i @p n (`m->exp - n->exp`)
+ */
 static int MonoCompareByExp(const void *m, const void *n)
 {
 	poly_exp_t m_exp = ((Mono*) m)->exp;
@@ -157,9 +222,13 @@ static int MonoCompareByExp(const void *m, const void *n)
 	return (m_exp - n_exp);
 }
 
-/*
- * TODO
+/**
+ * Sortuję tablicę jednomianów rosnąco pod względem wykładnika.
+ * Wykorzystuje do tego algorytm QuickSort.
  * Przejmuje na własność zawartość tablicy @p monos.
+ * @param[in] count : liczba jednomianów (rozmiar tablicy)
+ * @param[in] monos : tablica jednomianów
+ * @return posortowana tablica
  */
 static Mono* MonoSortArrayByExp(unsigned count, const Mono monos[])
 {
@@ -168,9 +237,13 @@ static Mono* MonoSortArrayByExp(unsigned count, const Mono monos[])
 	return new_monos;
 }
 
-/*
- * TODO
+/**
+ * Przeprowadza na posortowanej tablicy jednomianów redukcję wyrazów podobnych.
+ * Łączy ze sobą jednomiany o tym samym wykładniku,
+ * a na puste miejsca wstawia jednomiany zerowe.
  * Modyfikuje zawartość tablicy @p monos.
+ * @param[in] count : liczba jednomianów (rozmiar tablicy)
+ * @param[in] monos : tablica jednomianów
  */
 static void MonoArrayReduceLikeTerms(unsigned count, Mono monos[])
 {
@@ -185,9 +258,16 @@ static void MonoArrayReduceLikeTerms(unsigned count, Mono monos[])
 	}
 }
 
-/*
- * TODO
+/**
+ * Usuwa jednomiany zerowe z tablicy jednomianów.
+ * Tworzy nową tablicę, do której przekoopiowuje wszystkie jednomiany z @p monos
+ * poza jednomianami zerowymi.
  * Przejmuje na własność zawartość tablicy @p monos.
+ * @param[in] count : liczba jednomianów (rozmiar tablicy)
+ * @param[in] monos : tablica jednomianów
+ * @param[in] new_count : wskaźnik na zmienną, na którą będzie przypisana
+ * liczba niezerowych jendomianów (rozmiar nowej tablicy)
+ * @return tablica z usuniętymi jednomianami zerowymi
  */
 static Mono* MonoArrayReduceZeroTerms(unsigned count, Mono monos[], unsigned *new_count)
 {
@@ -229,9 +309,16 @@ static Mono* MonoArrayReduceZeroTerms(unsigned count, Mono monos[], unsigned *ne
 	}
 }
 
-/*
- * TODO
+/**
+ * Optymalizuje tablicę jendomianów, aby można było ją zaszczepić w wielomianie.
+ * Sortuje elementy rosnąco względem wykładników, redukuje wyrazy podobne i
+ * usuwa z niej jendomiany zerowe.
  * Przejmuje na własność zawartość tablicy @p monos.
+ * @param[in] count : liczba jednomianów (rozmiar tablicy)
+ * @param[in] monos : tablica jednomianów
+ * @param[in] new_count : wskaźnik na zmienną, na którą będzie przypisana
+ * liczba niezerowych jendomianów (rozmiar nowej tablicy)
+ * @return zoptymalizowana tablica
  */
 static Mono* MonoOptimizedArray(unsigned count, const Mono monos[], unsigned *new_count)
 {
@@ -242,6 +329,12 @@ static Mono* MonoOptimizedArray(unsigned count, const Mono monos[], unsigned *ne
 	return new_monos;
 }
 
+/**
+ * Mnoży dwa jednomiany.
+ * @param[in] m : jednomian
+ * @param[in] n : jednomian
+ * @return `m * n`
+ */
 static Mono MonoMul(const Mono *m, const Mono *n)
 {
 	if (MonoIsZero(m) || MonoIsZero(n))
@@ -265,6 +358,12 @@ static Mono MonoMul(const Mono *m, const Mono *n)
 	}
 }
 
+/**
+ * Mnoży wielomian przez jednomian.
+ * @param[in] p : wielomian
+ * @param[in] m : jednomian
+ * @return `p * m`
+ */
 static Poly PolyMulByMono(const Poly *p, const Mono *m)
 {
 	if (PolyIsZero(p) || MonoIsZero(m))
@@ -299,7 +398,17 @@ static Poly PolyMulByMono(const Poly *p, const Mono *m)
 	}
 }
 
-Poly PolyCoeffFromMonoExp(const Mono *m, poly_coeff_t x)
+/**
+ * Tworzy wielomian stały równy co do wartości zmiennej jednomianu
+ * w punkcie @p x podniesionej do swojego wykładnika @p e.
+ * Nie bierze pod uwagę współczynnika jednomianu @p m.
+ * Dla jednomianu `p * x_0^e` wynikiem jest wielomian stały równy
+ * co do wartości `x^e`.
+ * @param[in] m : jednomian
+ * @param[in] x : wartość do podstawienia za zmienną jednomianu @p m
+ * @return wielomian stały `x^e`
+ */
+static Poly PolyCoeffFromMonoExp(const Mono *m, poly_coeff_t x)
 {
 
 	poly_coeff_t result = 1;
@@ -316,13 +425,22 @@ Poly PolyCoeffFromMonoExp(const Mono *m, poly_coeff_t x)
     return PolyFromCoeff(result);
 }
 
+/**
+ * Wylicza wartość jednomianu w punkcie @p x.
+ * Wstawia pod pierwszą zmienną jednomianu wartość @p x.
+ * W wyniku może powstać wielomian, jeśli współczynniki są wielomianem
+ * i zmniejszane są indeksy zmiennych w takim wielomianie o jeden.
+ * Formalnie dla jednomianu @f$p(x_1, x_2, \ldots) * x_0^e@f$ wynikiem jest
+ * wielomian @f$p(x_0, x_1, \ldots) * x^e@f$.
+ * @param[in] m : jednomian
+ * @param[in] x : wartość do podstawienia za zmienną jednomianu @p m
+ * @return @f$p(x_0, x_1, \ldots) * x^e@f$
+ */
 static Poly MonoAt(const Mono *m, poly_coeff_t x)
 {
 	Poly temp_poly = PolyCoeffFromMonoExp(m, x);
 	return PolyMul(&(m->p), &temp_poly);
 }
-
-// Główne funkcje biblioteki
 
 void PolyDestroy(Poly *p)
 {
