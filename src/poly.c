@@ -126,9 +126,12 @@ static Mono MonoAdd(const Mono *m, const Mono *n)
 	return (Mono) {.p = PolyAdd(&(m->p), &(n->p)), .exp = m->exp};
 }
 
-static Mono* MonoArrayMerge(unsigned count_1, const Mono monos_1[],
-							unsigned count_2, const Mono monos_2[])
-{
+static Mono* MonoArrayMerge(
+	unsigned count_1,
+	const Mono monos_1[],
+	unsigned count_2,
+	const Mono monos_2[]
+) {
 	unsigned new_count = count_1 + count_2;
 	Mono* new_monos = MonoCreateArray(new_count);
 
@@ -179,9 +182,12 @@ static Poly PolyMerge(const Poly *p, const Poly *q)
 
 	else
 	{
+		Mono* new_monos;
+		new_monos = MonoArrayMerge(p->count, p->monos, q->count, q->monos);
 		unsigned new_count = p->count + q->count;
-		Mono* new_monos = MonoArrayMerge(p->count, p->monos, q->count, q->monos);
+
 		Poly new_poly = PolyAddMonos(new_count, new_monos);
+
 		free(new_monos);
 		free(p->monos);
 		free(q->monos);
@@ -255,6 +261,20 @@ static void MonoArrayReduceLikeTerms(unsigned count, Mono monos[])
 	}
 }
 
+static unsigned MonoArrayCountMonoZeros(unsigned count, const Mono monos[])
+{
+	unsigned mono_zeros_count = 0;
+	for (unsigned i = 0; i < count; i++)
+	{
+		if (MonoIsZero(&monos[i]))
+		{
+			mono_zeros_count++;
+		}
+	}
+
+	return mono_zeros_count;
+}
+
 /**
  * Usuwa jednomiany zerowe z tablicy jednomianów.
  * Tworzy nową tablicę, do której przekoopiowuje wszystkie jednomiany z @p monos
@@ -266,18 +286,12 @@ static void MonoArrayReduceLikeTerms(unsigned count, Mono monos[])
  * liczba niezerowych jendomianów (rozmiar nowej tablicy)
  * @return tablica z usuniętymi jednomianami zerowymi
  */
-static Mono* MonoArrayReduceZeroTerms(unsigned count, Mono monos[], unsigned *new_count)
-{
-	unsigned reduced_terms = 0;
-	for (unsigned i = 0; i < count; i++)
-	{
-		if (MonoIsZero(&monos[i]))
-		{
-			reduced_terms++;
-		}
-	}
-
-	*new_count = count - reduced_terms;
+static Mono* MonoArrayReduceZeroTerms(
+	unsigned count,
+	const Mono monos[],
+	unsigned *new_count
+) {
+	*new_count = count - MonoArrayCountMonoZeros(count, monos);
 
 	if (*new_count)
 	{
@@ -309,7 +323,7 @@ static Mono* MonoArrayReduceZeroTerms(unsigned count, Mono monos[], unsigned *ne
 /**
  * Optymalizuje tablicę jendomianów, aby można było ją zaszczepić w wielomianie.
  * Sortuje elementy rosnąco względem wykładników, redukuje wyrazy podobne i
- * usuwa z niej jendomiany zerowe.
+ * usuwa z niej jednomiany zerowe.
  * Przejmuje na własność zawartość tablicy @p monos.
  * @param[in] count : liczba jednomianów (rozmiar tablicy)
  * @param[in] monos : tablica jednomianów
@@ -317,8 +331,11 @@ static Mono* MonoArrayReduceZeroTerms(unsigned count, Mono monos[], unsigned *ne
  * liczba niezerowych jendomianów (rozmiar nowej tablicy)
  * @return zoptymalizowana tablica
  */
-static Mono* MonoOptimizedArray(unsigned count, const Mono monos[], unsigned *new_count)
-{
+static Mono* MonoOptimizedArray(
+	unsigned count,
+	const Mono monos[],
+	unsigned *new_count
+) {
 	Mono* sorted_monos = MonoSortArrayByExp(count, monos);
 	MonoArrayReduceLikeTerms(count, sorted_monos);
 	Mono* new_monos = MonoArrayReduceZeroTerms(count, sorted_monos, new_count);
@@ -553,8 +570,6 @@ Poly PolyMul(const Poly *p, const Poly *q)
 
 			new_poly = temp_poly;
 		}
-
-
 
 		return new_poly;
 	}
