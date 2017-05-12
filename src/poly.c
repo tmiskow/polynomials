@@ -58,7 +58,6 @@ static void MonoArrayDestroy(unsigned count, Mono monos[])
 	for (unsigned i = 0; i < count; i++)
 	{
 		MonoDestroy(&monos[i]);
-		monos[i] = MonoZero();
 	}
 
 	free(monos);
@@ -111,19 +110,6 @@ static Mono* MonoCopyArray(unsigned count, const Mono monos[])
 	}
 
 	return monos_copy;
-}
-
-/**
- * Dodaje dwa jednomiany.
- * @param[in] m : jednomian
- * @param[in] n : jednomian
- * @return `m + n`
- */
-static Mono MonoAdd(const Mono *m, const Mono *n)
-{
-	assert(m->exp == n->exp);
-
-	return (Mono) {.p = PolyAdd(&(m->p), &(n->p)), .exp = m->exp};
 }
 
 static Mono* MonoArrayMerge(
