@@ -126,6 +126,25 @@ static Mono MonoAdd(const Mono *m, const Mono *n)
 	return (Mono) {.p = PolyAdd(&(m->p), &(n->p)), .exp = m->exp};
 }
 
+static Mono* MonoArrayMerge(unsigned count_1, const Mono monos_1[],
+							unsigned count_2, const Mono monos_2[])
+{
+	unsigned new_count = count_1 + count_2;
+	Mono* new_monos = MonoCreateArray(new_count);
+
+	for (unsigned i = 0; i < count_1; i++)
+	{
+		new_monos[i] = monos_1[i];
+	}
+
+	for (unsigned i = count_1; i < new_count; i++)
+	{
+		new_monos[i] = monos_2[i - count_1];
+	}
+
+	return new_monos;
+}
+
 /**
  * Łączy dwa wielomiany w jeden.
  * Przejmuje na własność wielomiany @p p i @p q.
@@ -137,25 +156,20 @@ static Poly PolyMerge(const Poly *p, const Poly *q)
 {
 	if (PolyIsCoeff(p) && PolyIsCoeff(q))
 	{
-		return PolyAdd(p, q);
+		return PolyFromCoeff(p->coeff + q->coeff);
+	}
+
+	else if (PolyIsZero(q))
+	{
+		return *p;
 	}
 
 	else if (PolyIsCoeff(q))
 	{
-		unsigned new_count = p->count + 1;
-		Mono* new_monos = MonoCreateArray(new_count);
-
-		new_monos[0] = MonoFromPoly(q, 0);
-
-		for (unsigned i = 1; i < new_count; i++)
-		{
-			new_monos[i] = p->monos[i-1];
-		}
-
-		Poly new_poly = PolyAddMonos(new_count, new_monos);
-		free(new_monos);
-		free(p->monos);
-		return new_poly;
+		Mono* temp_monos = MonoCreateArray(1);
+		temp_monos[0] = MonoFromPoly(q, 0);
+		Poly temp_poly = (Poly) {.monos = temp_monos, .count = 1, .coeff = 0};
+		return PolyMerge(p, &temp_poly);
 	}
 
 	else if (PolyIsCoeff(p))
@@ -166,24 +180,7 @@ static Poly PolyMerge(const Poly *p, const Poly *q)
 	else
 	{
 		unsigned new_count = p->count + q->count;
-		Mono* new_monos = MonoCreateArray(new_count);
-
-		unsigned i = 0;
-
-		while (i < p->count)
-		{
-			new_monos[i] = p->monos[i];
-			p->monos[i] = MonoZero();
-			i++;
-		}
-
-		while (i < new_count)
-		{
-			new_monos[i] = q->monos[i - p->count];
-			q->monos[i - p->count] = MonoZero();
-			i++;
-		}
-
+		Mono* new_monos = MonoArrayMerge(p->count, p->monos, q->count, q->monos);
 		Poly new_poly = PolyAddMonos(new_count, new_monos);
 		free(new_monos);
 		free(p->monos);
@@ -467,57 +464,9 @@ Poly PolyClone(const Poly *p)
 
 Poly PolyAdd(const Poly *p, const Poly *q)
 {
-	if (PolyIsCoeff(p) && PolyIsCoeff(q))
-	{
-		return (Poly) {.monos = NULL, .count = 0, .coeff = p->coeff + q->coeff};
-	}
-
-	else if (PolyIsCoeff(q))
-	{
-		unsigned new_count = p->count + 1;
-		Mono* new_monos = MonoCreateArray(new_count);
-
-		new_monos[0] = MonoFromPoly(q, 0);
-
-		for (unsigned i = 1; i < new_count; i++)
-		{
-			new_monos[i] = MonoClone(&(p->monos[i-1]));
-		}
-
-		Poly new_poly = PolyAddMonos(new_count, new_monos);
-		free(new_monos);
-		return new_poly;
-	}
-
-	else if (PolyIsCoeff(p))
-	{
-		return PolyAdd(q, p);
-	}
-
-	else
-	{
-		unsigned new_count = p->count + q->count;
-		Mono* new_monos = MonoCreateArray(new_count);
-
-		unsigned i = 0;
-
-		while (i < p->count)
-		{
-			new_monos[i] = MonoClone(&(p->monos[i]));
-			i++;
-		}
-
-		while (i < new_count)
-		{
-			new_monos[i] = MonoClone(&(q->monos[i - p->count]));
-			i++;
-		}
-
-		Poly new_poly = PolyAddMonos(new_count, new_monos);
-		free(new_monos);
-
-		return new_poly;
-	}
+	Poly p_clone = PolyClone(p);
+	Poly q_clone = PolyClone(q);
+	return PolyMerge(&p_clone, &q_clone);
 }
 
 Poly PolyAddMonos(unsigned count, const Mono monos[])
