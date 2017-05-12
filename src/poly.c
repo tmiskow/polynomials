@@ -1,5 +1,5 @@
 /** @file
-   Implemnatcja funkcji z poly.h i statycznych funkcji pomocniczych
+   Implementacja funkcji z poly.h i statycznych funkcji pomocniczych
 
    @author Tomasz Miśków <tm385898@students.mimuw.edu.pl>
    @copyright Uniwersytet Warszawski
@@ -7,6 +7,17 @@
 */
 
 #include "poly.h"
+
+/** @defgroup main_functions Funkcje główne
+ * Główne funkcje biblioteki.
+ * @defgroup auxiliary_functions Funkcje pomocnicze
+ * Statyczne funkcje pomocnicze wykorzystywane przez funkcje główne.
+ */
+
+ /**
+ * @ingroup auxiliary_functions
+ * @{
+ */
 
 /**
  * Tworzy jednomian tożsamościowo równy zeru.
@@ -112,6 +123,15 @@ static Mono* MonoCopyArray(unsigned count, const Mono monos[])
 	return monos_copy;
 }
 
+/**
+ * Łączy dwie tablice jednomianów w jedną.
+ * Przejmuje na własność zawartości tablic @p monos_1 i @p monos_2.
+ * @param[in] count_1 : liczba jednomianów w @p monos_1 (rozmiar tablicy)
+ * @param[in] monos_1 : pierwsza tablica jednomianów (`[m1, m2, ...]`)
+ * @param[in] count_2 : liczba jednomianów w @p monos_2 (rozmiar tablicy)
+ * @param[in] monos_2 : druga tablica jednomianów (`[n1, n2, ...]`)
+ * @return tablica `[m1, m2, ..., n1, n2, ...]` o rozmiarze `count_1 + count_2`
+ */
 static Mono* MonoArrayMerge(
 	unsigned count_1,
 	const Mono monos_1[],
@@ -170,10 +190,7 @@ static Poly PolyMerge(const Poly *p, const Poly *q)
 	{
 		Mono* new_monos;
 		new_monos = MonoArrayMerge(p->count, p->monos, q->count, q->monos);
-		unsigned new_count = p->count + q->count;
-
-		Poly new_poly = PolyAddMonos(new_count, new_monos);
-
+		Poly new_poly = PolyAddMonos(p->count + q->count, new_monos);
 		free(new_monos);
 		free(p->monos);
 		free(q->monos);
@@ -247,6 +264,12 @@ static void MonoArrayReduceLikeTerms(unsigned count, Mono monos[])
 	}
 }
 
+/**
+ * Zwraca ilość zerowych jednomianów w tablicy jednomianów.
+ * @param[in] count : liczba jednomianów (rozmiar tablicy)
+ * @param[in] monos : tablica jednomianów
+ * @return liczba jednomianów zerowych w tablicy
+ */
 static unsigned MonoArrayCountMonoZeros(unsigned count, const Mono monos[])
 {
 	unsigned mono_zeros_count = 0;
@@ -441,6 +464,13 @@ static Poly MonoAt(const Mono *m, poly_coeff_t x)
 	Poly temp_poly = PolyCoeffFromMonoExp(m, x);
 	return PolyMul(&(m->p), &temp_poly);
 }
+
+/** @} */ // end of auxiliary_functions
+
+/**
+* @ingroup main_functions
+* @{
+*/
 
 void PolyDestroy(Poly *p)
 {
@@ -702,3 +732,5 @@ Poly PolyAt(const Poly *p, poly_coeff_t x)
 		return new_poly;
 	}
 }
+
+/** @} */ // end of main_functions
