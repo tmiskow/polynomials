@@ -422,6 +422,55 @@ static Poly PolyMulByMono(const Poly *p, const Mono *m)
 }
 
 /**
+ * Mnoży wielomian przez stały współczynnik.
+ * @param[in] p : wielomian
+ * @param[in] coeff : stały wspołczynnik liczbowy
+ * @return `coeff * p`
+ */
+static Poly PolyMulByCoeff(const Poly *p, poly_coeff_t coeff)
+{
+	if (PolyIsZero(p) || coeff == 0)
+	{
+		return PolyZero();
+	}
+
+	else if (PolyIsCoeff(p))
+	{
+		return PolyFromCoeff(p->coeff * coeff);
+	}
+
+	else
+	{
+		Poly coeff_poly = PolyFromCoeff(coeff);
+
+		unsigned new_count = p->count;
+		Mono* new_monos = MonoArrayCreate(new_count);
+
+		for (unsigned i = 0; i < new_count; i++)
+		{
+			Mono temp_mono = p->monos[i];
+			Poly temp_poly = temp_mono.p;
+			new_monos[i] = (Mono)
+			{
+				.p = PolyMul(&temp_poly, &coeff_poly),
+				.exp = temp_mono.exp
+			};
+		}
+
+		if (new_count == 1 && MonoIsZero(new_monos))
+		{
+			free(new_monos);
+			return PolyZero();
+		}
+
+		else
+		{
+			return (Poly) {.monos = new_monos, .count = new_count, .coeff = 0};
+		}
+	}
+}
+
+/**
  * Tworzy wielomian stały równy co do wartości pierwszej zmiennej jednomianu
  * w punkcie @p x podniesionej do swojego wykładnika @p e.
  * Nie bierze pod uwagę współczynnika jednomianu @p m.
@@ -533,42 +582,14 @@ Poly PolyMul(const Poly *p, const Poly *q)
 		return PolyZero();
 	}
 
-	else if (PolyIsCoeff(p) && PolyIsCoeff(q))
-	{
-		return PolyFromCoeff((p->coeff)*(q->coeff));
-	}
-
 	else if (PolyIsCoeff(q))
 	{
-		unsigned new_count = p->count;
-		Mono* new_monos = MonoArrayCreate(new_count);
-
-		for (unsigned i = 0; i < new_count; i++)
-		{
-			Mono temp_mono = p->monos[i];
-			Poly temp_poly = temp_mono.p;
-			new_monos[i] = (Mono)
-			{
-				.p = PolyMul(&temp_poly, q),
-				.exp = temp_mono.exp
-			};
-		}
-
-		if (new_count == 1 && MonoIsZero(new_monos))
-		{
-			free(new_monos);
-			return PolyZero();
-		}
-
-		else
-		{
-			return (Poly) {.monos = new_monos, .count = new_count, .coeff = 0};
-		}
+		return PolyMulByCoeff(p, q->coeff);
 	}
 
 	else if (PolyIsCoeff(p))
 	{
-		return PolyMul(q, p);
+		return PolyMulByCoeff(q, p->coeff);
 	}
 
 	else
