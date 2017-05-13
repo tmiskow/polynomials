@@ -34,7 +34,7 @@ typedef struct Mono Mono;
 struct Poly
 {
 	Mono* monos; ///< tablica jednomianów
-	unsigned count; ///< liczba jednomianów w @p monos
+	unsigned count; ///< liczba jednomianów w @p monos (rozmiar tablicy)
 	poly_coeff_t coeff; ///< współczynnik liczbowy
 };
 
@@ -51,7 +51,7 @@ struct Mono
 };
 
 /**
-* @ingroup main_functions
+* @ingroup funkcje_główne
 * @{
 */
 
@@ -219,6 +219,6 @@ bool PolyIsEq(const Poly *p, const Poly *q);
  */
 Poly PolyAt(const Poly *p, poly_coeff_t x);
 
-/** @} */ // end of main_functions
+/** @} */ // koniec grupy funkcje_główne
 
 #endif /* __POLY_H__ */

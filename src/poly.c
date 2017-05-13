@@ -8,14 +8,14 @@
 
 #include "poly.h"
 
-/** @defgroup main_functions Funkcje główne
+/** @defgroup funkcje_główne Funkcje główne
  * Główne funkcje biblioteki.
- * @defgroup auxiliary_functions Funkcje pomocnicze
+ * @defgroup funkcje_pomocnicze Funkcje pomocnicze
  * Statyczne funkcje pomocnicze wykorzystywane przez funkcje główne.
  */
 
  /**
- * @ingroup auxiliary_functions
+ * @ingroup funkcje_pomocnicze
  * @{
  */
 
@@ -79,7 +79,7 @@ static void MonoArrayDestroy(unsigned count, Mono monos[])
  * @param[in] count : liczba jednomianów (rozmiar tablicy)
  * @return tablica jednomianów
  */
-static Mono* MonoCreateArray(unsigned count)
+static Mono* MonoArrayCreate(unsigned count)
 {
 	Mono* monos = (Mono*) malloc(count * sizeof(Mono));
 	assert(monos);
@@ -92,9 +92,9 @@ static Mono* MonoCreateArray(unsigned count)
  * @param[in] monos : tablica jednomianów
  * @return skopiowana tablica
  */
-static Mono* MonoCloneArray(unsigned count, const Mono monos[])
+static Mono* MonoArrayClone(unsigned count, const Mono monos[])
 {
-	Mono* monos_clone = MonoCreateArray(count);
+	Mono* monos_clone = MonoArrayCreate(count);
 
 	for (unsigned i = 0; i < count; i++)
 	{
@@ -111,9 +111,9 @@ static Mono* MonoCloneArray(unsigned count, const Mono monos[])
  * @param[in] monos : tablica jednomianów
  * @return skopiowana tablica
  */
-static Mono* MonoCopyArray(unsigned count, const Mono monos[])
+static Mono* MonoArrayCopy(unsigned count, const Mono monos[])
 {
-	Mono* monos_copy = MonoCreateArray(count);
+	Mono* monos_copy = MonoArrayCreate(count);
 
 	for (unsigned i = 0; i < count; i++)
 	{
@@ -139,7 +139,7 @@ static Mono* MonoArrayMerge(
 	const Mono monos_2[]
 ) {
 	unsigned new_count = count_1 + count_2;
-	Mono* new_monos = MonoCreateArray(new_count);
+	Mono* new_monos = MonoArrayCreate(new_count);
 
 	for (unsigned i = 0; i < count_1; i++)
 	{
@@ -175,7 +175,7 @@ static Poly PolyMerge(const Poly *p, const Poly *q)
 
 	else if (PolyIsCoeff(q))
 	{
-		Mono* temp_monos = MonoCreateArray(1);
+		Mono* temp_monos = MonoArrayCreate(1);
 		temp_monos[0] = MonoFromPoly(q, 0);
 		Poly temp_poly = (Poly) {.monos = temp_monos, .count = 1, .coeff = 0};
 		return PolyMerge(p, &temp_poly);
@@ -236,9 +236,9 @@ static int MonoCompareByExp(const void *m, const void *n)
  * @param[in] monos : tablica jednomianów
  * @return posortowana tablica
  */
-static Mono* MonoSortArrayByExp(unsigned count, const Mono monos[])
+static Mono* MonoArraySortByExp(unsigned count, const Mono monos[])
 {
-	Mono* new_monos = MonoCopyArray(count, monos);
+	Mono* new_monos = MonoArrayCopy(count, monos);
 	qsort(new_monos, count, sizeof (Mono), MonoCompareByExp);
 	return new_monos;
 }
@@ -270,7 +270,7 @@ static void MonoArrayReduceLikeTerms(unsigned count, Mono monos[])
  * @param[in] monos : tablica jednomianów
  * @return liczba jednomianów zerowych w tablicy
  */
-static unsigned MonoArrayCountMonoZeros(unsigned count, const Mono monos[])
+static unsigned MonoArrayCountZeroTerms(unsigned count, const Mono monos[])
 {
 	unsigned mono_zeros_count = 0;
 	for (unsigned i = 0; i < count; i++)
@@ -300,11 +300,11 @@ static Mono* MonoArrayReduceZeroTerms(
 	const Mono monos[],
 	unsigned *new_count
 ) {
-	*new_count = count - MonoArrayCountMonoZeros(count, monos);
+	*new_count = count - MonoArrayCountZeroTerms(count, monos);
 
 	if (*new_count)
 	{
-		Mono* new_monos = MonoCreateArray(*new_count);
+		Mono* new_monos = MonoArrayCreate(*new_count);
 		unsigned i = 0;
 		unsigned j = 0;
 
@@ -340,12 +340,12 @@ static Mono* MonoArrayReduceZeroTerms(
  * liczba niezerowych jendomianów (rozmiar nowej tablicy)
  * @return zoptymalizowana tablica
  */
-static Mono* MonoOptimizedArray(
+static Mono* MonoArrayOptimize(
 	unsigned count,
 	const Mono monos[],
 	unsigned *new_count
 ) {
-	Mono* sorted_monos = MonoSortArrayByExp(count, monos);
+	Mono* sorted_monos = MonoArraySortByExp(count, monos);
 	MonoArrayReduceLikeTerms(count, sorted_monos);
 	Mono* new_monos = MonoArrayReduceZeroTerms(count, sorted_monos, new_count);
 	free(sorted_monos);
@@ -410,7 +410,7 @@ static Poly PolyMulByMono(const Poly *p, const Mono *m)
 	else
 	{
 		unsigned new_count = p->count;
-		Mono* new_monos = MonoCreateArray(new_count);
+		Mono* new_monos = MonoArrayCreate(new_count);
 
 		for (unsigned i = 0; i < new_count; i++)
 		{
@@ -422,16 +422,16 @@ static Poly PolyMulByMono(const Poly *p, const Mono *m)
 }
 
 /**
- * Tworzy wielomian stały równy co do wartości zmiennej jednomianu
+ * Tworzy wielomian stały równy co do wartości pierwszej zmiennej jednomianu
  * w punkcie @p x podniesionej do swojego wykładnika @p e.
  * Nie bierze pod uwagę współczynnika jednomianu @p m.
  * Dla jednomianu `p * x_0^e` wynikiem jest wielomian stały równy
  * co do wartości `x^e`.
  * @param[in] m : jednomian
  * @param[in] x : wartość do podstawienia za zmienną jednomianu @p m
- * @return wielomian stały `x^e`
+ * @return wielomian stały o wartości `x^e`
  */
-static Poly PolyCoeffFromMonoExp(const Mono *m, poly_coeff_t x)
+static Poly MonoVarAt(const Mono *m, poly_coeff_t x)
 {
 
 	poly_coeff_t result = 1;
@@ -461,14 +461,14 @@ static Poly PolyCoeffFromMonoExp(const Mono *m, poly_coeff_t x)
  */
 static Poly MonoAt(const Mono *m, poly_coeff_t x)
 {
-	Poly temp_poly = PolyCoeffFromMonoExp(m, x);
+	Poly temp_poly = MonoVarAt(m, x);
 	return PolyMul(&(m->p), &temp_poly);
 }
 
-/** @} */ // end of auxiliary_functions
+/** @} */ // koniec grupy pomocnicze_funkcje
 
 /**
-* @ingroup main_functions
+* @ingroup funkcje_główne
 * @{
 */
 
@@ -488,7 +488,7 @@ Poly PolyClone(const Poly *p)
 	{
 		return (Poly)
 		{
-			.monos = MonoCloneArray(p->count, p->monos),
+			.monos = MonoArrayClone(p->count, p->monos),
 			.count = p->count,
 			.coeff = 0
 		};
@@ -505,7 +505,7 @@ Poly PolyAdd(const Poly *p, const Poly *q)
 Poly PolyAddMonos(unsigned count, const Mono monos[])
 {
 	unsigned new_count;
-	Mono* new_monos = MonoOptimizedArray(count, monos, &new_count);
+	Mono* new_monos = MonoArrayOptimize(count, monos, &new_count);
 
 	if (new_count == 0)
 	{
@@ -541,7 +541,7 @@ Poly PolyMul(const Poly *p, const Poly *q)
 	else if (PolyIsCoeff(q))
 	{
 		unsigned new_count = p->count;
-		Mono* new_monos = MonoCreateArray(new_count);
+		Mono* new_monos = MonoArrayCreate(new_count);
 
 		for (unsigned i = 0; i < new_count; i++)
 		{
@@ -733,4 +733,4 @@ Poly PolyAt(const Poly *p, poly_coeff_t x)
 	}
 }
 
-/** @} */ // end of main_functions
+/** @} */ // koniec grupy funkcje_główne
