@@ -6,12 +6,4 @@
    @date TODO
 */
 
-#include "parser.h"
-#include "calc.h"
-
-int main(int argc, char const *argv[]) {
-
-	/* TODO */
-
-	return 0;
-}
+/* TODO */
