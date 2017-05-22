@@ -6,6 +6,14 @@
    @date TODO
 */
 
+#ifndef __CALC_H__
+#define __CALC_H__
+
 #include "poly.h"
 
-/* TODO *
+/** TODO */
+void CalcPrint(const Poly *p);
+
+/* TODO */
+
+#endif /* __CALC_H__ */
