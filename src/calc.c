@@ -7,6 +7,7 @@
 */
 
 #include "poly.h"
+#include "stakc.h"
 #include "calc.h"
 
 #include <stdio.h>
@@ -24,13 +25,15 @@ static void CalcPrintPoly(const Poly *p);
 
 /* IMPLEMENTACJA FUNKCJI POMOCNICZYCH */
 
-static void CalcPrintMono(const Mono* m) {
+static void CalcPrintMono(const Mono* m)
+{
 	printf("(");
 	CalcPrintPoly(&(m->p));
 	printf(",%d)", m->exp);
 }
 
-static void CalcPrintMonoArray(unsigned count, const Mono monos[]) {
+static void CalcPrintMonoArray(unsigned count, const Mono monos[])
+{
 	CalcPrintMono(&(monos[0]));
 
 	for (unsigned i = 1; i < count; i++)
@@ -40,7 +43,8 @@ static void CalcPrintMonoArray(unsigned count, const Mono monos[]) {
 	}
 }
 
-static void CalcPrintPoly(const Poly *p) {
+static void CalcPrintPoly(const Poly *p)
+{
 	if (PolyIsCoeff(p))
 	{
 		printf("%ld", p->coeff);
@@ -53,7 +57,10 @@ static void CalcPrintPoly(const Poly *p) {
 
 /* IMPLEMENTACJA FUNKCJI GŁÓWNYCH */
 
-void CalcPrint(const Poly *p) {
+void CalcPrint(Stack *stack)
+{
+	Poly p = StackPop(stack);
 	CalcPrintPoly(p);
 	printf("\n");
+	StackPush(stack, &p);
 }

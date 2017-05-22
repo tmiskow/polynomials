@@ -25,6 +25,9 @@ set(SOURCE_FILES
     src/poly.h
 	src/parser.h
 	src/calc.h
+	src/calc.c
+	src/stack.h
+	src/stack.c
     src/calc_poly.c
 )
 

@@ -12,7 +12,7 @@
 #include "poly.h"
 
 /** TODO */
-void CalcPrint(const Poly *p);
+void CalcPrint(Stack *stack);
 
 /* TODO */
 
