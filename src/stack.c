@@ -15,7 +15,7 @@ static StackItem* StackItemCreate();
 /** TODO
  * Przejmuje wielomian @p p na własność.
  */
-static StackItem StackItemFromPoly(const Poly *p, const StackItem *next);
+static StackItem StackItemFromPoly(const Poly *p, StackItem *next_item);
 
 /** TODO */
 static void StackItemDestroy(StackItem* stack_item);
@@ -30,13 +30,13 @@ static StackItem* StackItemCreate()
 	return new_item;
 }
 
-static StackItem StackItemFromPoly(const Poly *p, const StackItem *next)
+static StackItem StackItemFromPoly(const Poly *p, StackItem *next_item)
 {
 	return (StackItem)
 	{
-		.poly = *p;
-		.next = next;
-	}
+		.poly = *p,
+		.next_item = next_item
+	};
 }
 
 static void StackItemDestroy(StackItem* stack_item)
@@ -49,7 +49,7 @@ static void StackDestroyItemsRecursively(StackItem* stack_item)
 {
 	if (stack_item)
 	{
-		StackDestroyItemsRecursively(stack_item->next);
+		StackDestroyItemsRecursively(stack_item->next_item);
 		StackItemDestroy(stack_item);
 	}
 }
@@ -64,20 +64,20 @@ void StackDestroy(Stack *stack)
 	StackDestroyItemsRecursively(stack->top_item);
 }
 
-void StackPush(const Stack *stack, const Poly *p)
+void StackPush(Stack *stack, const Poly *p)
 {
 	StackItem *temp_pointer = stack->top_item;
 	stack->top_item = StackItemCreate();
 	*(stack->top_item) = StackItemFromPoly(p, temp_pointer);
 }
 
-Poly StackPop(const Stack *stack)
+Poly StackPop(Stack *stack)
 {
 	//DEBUG
 	assert(!StackIsEmpty(stack));
 
 	StackItem *temp_pointer = stack->top_item;
-	stack->top_item = (stack->top_item)->next;
+	stack->top_item = (stack->top_item)->next_item;
 	Poly p = temp_pointer->poly;
 	free(temp_pointer);
 	return p;

@@ -7,7 +7,7 @@
 */
 
 #include "poly.h"
-#include "stakc.h"
+#include "stack.h"
 #include "calc.h"
 
 #include <stdio.h>
@@ -60,7 +60,7 @@ static void CalcPrintPoly(const Poly *p)
 void CalcPrint(Stack *stack)
 {
 	Poly p = StackPop(stack);
-	CalcPrintPoly(p);
+	CalcPrintPoly(&p);
 	printf("\n");
 	StackPush(stack, &p);
 }

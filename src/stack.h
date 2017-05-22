@@ -42,10 +42,10 @@ void StackDestroy(Stack *stack);
 /** TODO
  * Stos przejmuje na własnośc wielomian @p p.
  */
-void StackPush(const Stack *stack, const Poly *p);
+void StackPush(Stack *stack, const Poly *p);
 
 /** TODO */
-Poly StackPop(const Stack *stack);
+Poly StackPop(Stack *stack);
 
 /** TODO */
 bool StackIsEmpty(const Stack *stack);
