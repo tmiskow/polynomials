@@ -21,4 +21,7 @@ void ErrorParserValue(int row);
 /** TODO */
 void ErrorParserVariable(int row);
 
+/** TODO */
+void ErrorStackUnderflow(int row);
+
 #endif /* __ERROR_H__ */

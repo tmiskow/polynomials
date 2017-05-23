@@ -10,12 +10,13 @@
 #define __CALC_H__
 
 #include "poly.h"
+#include "parser.h"
 
 /** TODO */
-void CalcAdd(Stack *stack);
+ParserResult CalcAdd(Stack *stack);
 
 /** TODO */
-void CalcPrint(Stack *stack);
+ParserResult CalcPrint(Stack *stack);
 
 /* TODO */
 

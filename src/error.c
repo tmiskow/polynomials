@@ -28,3 +28,9 @@ void ErrorParserVariable(int row)
 {
 	printf("ERROR %d WRONG VARIABLE\n", row);
 }
+
+void ErrorStackUnderflow(int row)
+{
+	// TODO
+	printf("ERROR %d STACK UNDERFLOW\n", row);
+}
