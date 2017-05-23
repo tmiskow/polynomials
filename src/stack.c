@@ -9,6 +9,9 @@
 #include "poly.h"
 #include "stack.h"
 
+#include <stdlib.h>
+#include <assert.h>
+
 /** TODO */
 static StackItem* StackItemCreate();
 
