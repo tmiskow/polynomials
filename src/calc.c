@@ -9,6 +9,7 @@
 #include "poly.h"
 #include "stack.h"
 #include "calc.h"
+#include "error.h"
 
 #include <stdio.h>
 
@@ -57,10 +58,44 @@ static void CalcPrintPoly(const Poly *p)
 
 /* IMPLEMENTACJA FUNKCJI GŁÓWNYCH */
 
+void CalcAdd(Stack *stack)
+{
+	if (StackIsEmpty(stack))
+	{
+		ErrorStackUnderflow();
+	}
+	else
+	{
+		Poly p1 = StackPop(stack);
+
+		if (StackIsEmpty(stack))
+		{
+			StackPush(stack, &p1);
+			ErrorStackUnderflow();
+		}
+		else
+		{
+			Poly p2 = StackPop(stack);
+			Poly poly = PolyAdd(&p1, &p2);
+			StackPush(stack, &poly);
+
+			PolyDestroy(&p1);
+			PolyDestroy(&p2);
+		}
+	}
+}
+
 void CalcPrint(Stack *stack)
 {
-	Poly p = StackPop(stack);
-	CalcPrintPoly(&p);
-	printf("\n");
-	StackPush(stack, &p);
+	if (StackIsEmpty(stack))
+	{
+		ErrorStackUnderflow();
+	}
+	else
+	{
+		Poly p = StackPop(stack);
+		CalcPrintPoly(&p);
+		printf("\n");
+		StackPush(stack, &p);
+	}
 }

@@ -12,6 +12,9 @@
 #include "poly.h"
 
 /** TODO */
+void CalcAdd(Stack *stack);
+
+/** TODO */
 void CalcPrint(Stack *stack);
 
 /* TODO */
