@@ -10,7 +10,6 @@
 #include "stack.h"
 #include "calc.h"
 #include "error.h"
-#include "parser.h"
 
 #include <stdio.h>
 
@@ -59,11 +58,11 @@ static void CalcPrintPoly(const Poly *p)
 
 /* IMPLEMENTACJA FUNKCJI GŁÓWNYCH */
 
-ParserResult CalcAdd(Stack *stack)
+FuncResult CalcAdd(Stack *stack)
 {
 	if (StackIsEmpty(stack))
 	{
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 	else
 	{
@@ -72,7 +71,7 @@ ParserResult CalcAdd(Stack *stack)
 		if (StackIsEmpty(stack))
 		{
 			StackPush(stack, &p1);
-			return PARSER_ERROR;
+			return FUNC_ERROR;
 		}
 		else
 		{
@@ -81,16 +80,16 @@ ParserResult CalcAdd(Stack *stack)
 			StackPush(stack, &poly);
 			PolyDestroy(&p1);
 			PolyDestroy(&p2);
-			return PARSER_SUCCESS;
+			return FUNC_SUCCESS;
 		}
 	}
 }
 
-ParserResult CalcPrint(Stack *stack)
+FuncResult CalcPrint(Stack *stack)
 {
 	if (StackIsEmpty(stack))
 	{
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 	else
 	{
@@ -99,6 +98,6 @@ ParserResult CalcPrint(Stack *stack)
 		printf("\n");
 		StackPush(stack, &p);
 
-		return PARSER_SUCCESS;
+		return FUNC_SUCCESS;
 	}
 }

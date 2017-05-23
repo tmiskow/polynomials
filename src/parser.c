@@ -60,25 +60,25 @@ static char CharPeek();
 static char ParseChar(int *col);
 
 /** TODO */
-static ParserResult ParseCoeff(int *col, poly_coeff_t *coeff);
+static FuncResult ParseCoeff(int *col, poly_coeff_t *coeff);
 
 /** TODO */
-static ParserResult ParseMonoExp(int *col, poly_exp_t *exp);
+static FuncResult ParseMonoExp(int *col, poly_exp_t *exp);
 
 /** TODO */
-static ParserResult ParseMono(int *col, Mono *m);
+static FuncResult ParseMono(int *col, Mono *m);
 
 /** TODO */
-static ParserResult ParsePoly(int *col, Poly *p);
+static FuncResult ParsePoly(int *col, Poly *p);
 
 /** TODO */
-static CalcCommand ParseCommandFromArray(char char_array[]);
+static ParserCommand ParseCommandFromArray(char char_array[]);
 
 /** TODO */
-static ParserResult ParseVarIdx(unsigned *var_idx);
+static FuncResult ParseVarIdx(unsigned *var_idx);
 
 /** TODO */
-static ParserResult ParseValue(poly_coeff_t *coeff);
+static FuncResult ParseValue(poly_coeff_t *coeff);
 
 /* IMPLEMENTACJA FUNKCJI POMOCNICZYCH */
 
@@ -150,7 +150,7 @@ static char ParseChar(int *col)
 	return getchar();
 }
 
-static ParserResult ParseCoeff(int *col, poly_coeff_t *coeff)
+static FuncResult ParseCoeff(int *col, poly_coeff_t *coeff)
 {
 	if (CharIsStartOfCoeff(CharPeek()))
 	{
@@ -164,7 +164,7 @@ static ParserResult ParseCoeff(int *col, poly_coeff_t *coeff)
 
 			if (!isdigit(CharPeek()))
 			{
-				return PARSER_ERROR;
+				return FUNC_ERROR;
 			}
 		}
 
@@ -175,7 +175,7 @@ static ParserResult ParseCoeff(int *col, poly_coeff_t *coeff)
 
 			if (!ParserCoeffIsInRange(parser_coeff, is_negative))
 			{
-				return PARSER_ERROR;
+				return FUNC_ERROR;
 			}
 		}
 
@@ -186,19 +186,19 @@ static ParserResult ParseCoeff(int *col, poly_coeff_t *coeff)
 			*coeff *= -1;
 		}
 
-		return PARSER_SUCCESS;
+		return FUNC_SUCCESS;
 	}
 	else
 	{
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 }
 
-static ParserResult ParseMonoExp(int *col, poly_exp_t *exp)
+static FuncResult ParseMonoExp(int *col, poly_exp_t *exp)
 {
 	if (!isdigit(CharPeek()))
 	{
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 	else
 	{
@@ -211,77 +211,77 @@ static ParserResult ParseMonoExp(int *col, poly_exp_t *exp)
 
 			if (!ParserExpIsInRange(parser_exp))
 			{
-				return PARSER_ERROR;
+				return FUNC_ERROR;
 			}
 		}
 
 		*exp = parser_exp;
-		return PARSER_SUCCESS;
+		return FUNC_SUCCESS;
 	}
 }
 
-static ParserResult ParseMono(int *col, Mono *m)
+static FuncResult ParseMono(int *col, Mono *m)
 {
 	if (CharPeek() == '(')
 	{
 		ParseChar(col);
 		Poly p;
-		if (ParsePoly(col, &p) != PARSER_ERROR)
+		if (ParsePoly(col, &p) != FUNC_ERROR)
 		{
 			if (CharPeek() == ',')
 			{
 				ParseChar(col);
 				poly_exp_t exp;
 
-				if (ParseMonoExp(col, &exp) != PARSER_ERROR)
+				if (ParseMonoExp(col, &exp) != FUNC_ERROR)
 				{
 					*m = MonoFromPoly(&p, exp);
 
 					if (CharPeek() == ')')
 					{
 						ParseChar(col);
-						return PARSER_SUCCESS;
+						return FUNC_SUCCESS;
 					}
 					else
 					{
-						return PARSER_ERROR;
+						return FUNC_ERROR;
 					}
 				}
 				else
 				{
-					return PARSER_ERROR;
+					return FUNC_ERROR;
 				}
 			}
 			else
 			{
-				return PARSER_ERROR;
+				return FUNC_ERROR;
 			}
 		}
 		else
 		{
-			return PARSER_ERROR;
+			return FUNC_ERROR;
 		}
 	}
 	else
 	{
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 }
 
-static ParserResult ParsePoly(int *col, Poly *p)
+static FuncResult ParsePoly(int *col, Poly *p)
 {
 	if (CharIsStartOfCoeff(CharPeek()))
 	{
 		poly_coeff_t coeff;
 
-		if (ParseCoeff(col, &coeff) == PARSER_ERROR)
+		if (ParseCoeff(col, &coeff) == FUNC_ERROR)
 		{
-			return PARSER_ERROR;
+			return FUNC_ERROR;
 		}
 		else
 		{
 			*p = PolyFromCoeff(coeff);
-			return PARSER_SUCCESS;
+			return FUNC_SUCCESS;
 		}
 	}
 	else if (CharPeek() == '(')
@@ -292,7 +292,7 @@ static ParserResult ParsePoly(int *col, Poly *p)
 
 		unsigned count = 0;
 
-		ParserResult parser_result = PARSER_SUCCESS;
+		FuncResult result = FUNC_SUCCESS;
 		do
 		{
 			if (CharPeek() == '+')
@@ -300,7 +300,7 @@ static ParserResult ParsePoly(int *col, Poly *p)
 				ParseChar(col);
 			}
 
-			parser_result = ParseMono(col, &(monos[count]));
+			result = ParseMono(col, &(monos[count]));
 			count++;
 
 			if (count == size - 1)
@@ -309,20 +309,20 @@ static ParserResult ParsePoly(int *col, Poly *p)
 				monos = (Mono*) realloc(monos, size * sizeof(Mono));
 				assert(monos);
 			}
-		} while (parser_result == PARSER_SUCCESS && CharPeek() == '+');
+		} while (result == FUNC_SUCCESS && CharPeek() == '+');
 
 		*p = PolyAddMonos(count, monos);
 		free(monos);
-		return parser_result;
+		return result;
 	}
 	else
 	{
 		*p = PolyZero();
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 }
 
-static CalcCommand ParseCommandFromArray(char char_array[])
+static ParserCommand ParseCommandFromArray(char char_array[])
 {
 	if (strcmp(char_array, "ZERO") == 0)
 	{
@@ -386,11 +386,11 @@ static CalcCommand ParseCommandFromArray(char char_array[])
 	}
 }
 
-static ParserResult ParseVarIdx(unsigned *var_idx)
+static FuncResult ParseVarIdx(unsigned *var_idx)
 {
 	if (!isdigit(CharPeek()))
 	{
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 	else
 	{
@@ -403,16 +403,16 @@ static ParserResult ParseVarIdx(unsigned *var_idx)
 
 			if (!ParserVarIndexIsInRange(parser_var_idx))
 			{
-				return PARSER_ERROR;
+				return FUNC_ERROR;
 			}
 		}
 
 		*var_idx = parser_var_idx;
-		return PARSER_SUCCESS;
+		return FUNC_SUCCESS;
 	}
 }
 
-static ParserResult ParseValue(poly_coeff_t *value)
+static FuncResult ParseValue(poly_coeff_t *value)
 {
 	if (CharIsStartOfCoeff(CharPeek()))
 	{
@@ -426,7 +426,7 @@ static ParserResult ParseValue(poly_coeff_t *value)
 
 			if (!isdigit(CharPeek()))
 			{
-				return PARSER_ERROR;
+				return FUNC_ERROR;
 			}
 		}
 
@@ -437,7 +437,7 @@ static ParserResult ParseValue(poly_coeff_t *value)
 
 			if (!ParserCoeffIsInRange(parser_coeff, is_negative))
 			{
-				return PARSER_ERROR;
+				return FUNC_ERROR;
 			}
 		}
 
@@ -448,11 +448,11 @@ static ParserResult ParseValue(poly_coeff_t *value)
 			*value *= -1;
 		}
 
-		return PARSER_SUCCESS;
+		return FUNC_SUCCESS;
 	}
 	else
 	{
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 }
 
@@ -468,27 +468,27 @@ bool ParserIsEndOfFile()
 	return CharPeek() == EOF;
 }
 
-ParserResult ParseLinePoly(Poly *p, int row)
+FuncResult ParseLinePoly(Poly *p, int row)
 {
 	int col = 1;
 
-	ParserResult parser_result = ParsePoly(&col, p);
+	FuncResult result = ParsePoly(&col, p);
 
-	if (parser_result == PARSER_ERROR || CharPeek() != '\n')
+	if (result == FUNC_ERROR || CharPeek() != '\n')
 	{
 		PolyDestroy(p);
 		ErrorParserPoly(row, col);
 		ParserSkipLine();
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 	else
 	{
 		ParserSkipLine();
-		return parser_result;
+		return result;
 	}
 }
 
-ParserResult ParseLineCommand(CalcCommand *command, poly_coeff_t *parameter, int row)
+FuncResult ParseLineCommand(ParserCommand *command, poly_coeff_t *parameter, int row)
 {
 	char char_array[MAX_COMMAND_LENGTH] = "";
 
@@ -506,7 +506,7 @@ ParserResult ParseLineCommand(CalcCommand *command, poly_coeff_t *parameter, int
 	{
 		ParserSkipLine();
 		ErrorParserCommand(1);
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 	else if (*command == CALC_DEG_BY || *command == CALC_AT)
 	{
@@ -519,7 +519,7 @@ ParserResult ParseLineCommand(CalcCommand *command, poly_coeff_t *parameter, int
 			switch (*command)
 			{
 				case CALC_DEG_BY:
-					if (ParseVarIdx(&var_idx) == PARSER_SUCCESS)
+					if (ParseVarIdx(&var_idx) == FUNC_SUCCESS)
 					{
 						*parameter = (poly_coeff_t) var_idx;
 					}
@@ -527,21 +527,21 @@ ParserResult ParseLineCommand(CalcCommand *command, poly_coeff_t *parameter, int
 					{
 						ParserSkipLine();
 						ErrorParserVariable(row);
-						return PARSER_ERROR;
+						return FUNC_ERROR;
 					}
 					break;
 
 				case CALC_AT:
-					if (ParseValue(parameter) == PARSER_ERROR)
+					if (ParseValue(parameter) == FUNC_ERROR)
 					{
 						ParserSkipLine();
 						ErrorParserValue(row);
-						return PARSER_ERROR;
+						return FUNC_ERROR;
 					}
 					break;
 				default:
 					assert(false);
-					return PARSER_ERROR;
+					return FUNC_ERROR;
 					break;
 			}
 
@@ -549,29 +549,29 @@ ParserResult ParseLineCommand(CalcCommand *command, poly_coeff_t *parameter, int
 			{
 				ParserSkipLine();
 				ErrorParserCommand(row);
-				return PARSER_ERROR;
+				return FUNC_ERROR;
 			}
 			else
 			{
-				return PARSER_SUCCESS;
+				return FUNC_SUCCESS;
 			}
 		}
 		else
 		{
 			ParserSkipLine();
 			ErrorParserCommand(1);
-			return PARSER_ERROR;
+			return FUNC_ERROR;
 		}
 	}
 	else if (CharPeek() != '\n')
 	{
 		ErrorParserCommand(1);
 		ParserSkipLine();
-		return PARSER_ERROR;
+		return FUNC_ERROR;
 	}
 	else
 	{
 		ParseChar(NULL);
-		return PARSER_SUCCESS;
+		return FUNC_SUCCESS;
 	}
 }

@@ -10,6 +10,13 @@
 #define __ERROR_H__
 
 /** TODO */
+typedef enum FuncResult
+{
+	FUNC_SUCCESS,
+	FUNC_ERROR
+} FuncResult;
+
+/** TODO */
 void ErrorParserPoly(int row, int col);
 
 /** TODO */

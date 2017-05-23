@@ -6,8 +6,6 @@
    @date TODO
 */
 
-// DEBUG
-#include "poly.h"
 #include "stack.h"
 #include "parser.h"
 #include "calc.h"
@@ -17,7 +15,7 @@
 #include <limits.h>
 
 /** TODO */
-ParserResult CommandExecute(CalcCommand command, poly_coeff_t parameter, Stack *stack);
+FuncResult CommandExecute(ParserCommand command, poly_coeff_t parameter, Stack *stack);
 
 int main(void) {
 
@@ -33,13 +31,13 @@ int main(void) {
 
 		if (ParserIsCommand())
 		{
-			CalcCommand command;
+			ParserCommand command;
 			poly_coeff_t parameter;
-			ParserResult parser_result = ParseLineCommand(&command, &parameter, row);
+			FuncResult parser_result = ParseLineCommand(&command, &parameter, row);
 
-			if (parser_result == PARSER_SUCCESS)
+			if (parser_result == FUNC_SUCCESS)
 			{
-				if (CommandExecute(command, parameter, &stack) == PARSER_ERROR)
+				if (CommandExecute(command, parameter, &stack) == FUNC_ERROR)
 				{
 					ErrorStackUnderflow(row);
 				}
@@ -53,9 +51,9 @@ int main(void) {
 		else
 		{
 			Poly p;
-			ParserResult parser_result = ParseLinePoly(&p, row);
+			FuncResult parser_result = ParseLinePoly(&p, row);
 
-			if (parser_result == PARSER_SUCCESS)
+			if (parser_result == FUNC_SUCCESS)
 			{
 				StackPush(&stack, &p);
 			}
@@ -72,7 +70,7 @@ int main(void) {
 	return 0;
 }
 
-ParserResult CommandExecute(CalcCommand command, poly_coeff_t parameter, Stack *stack)
+FuncResult CommandExecute(ParserCommand command, poly_coeff_t parameter, Stack *stack)
 {
 	// TODO
 	parameter = parameter;
@@ -89,7 +87,7 @@ ParserResult CommandExecute(CalcCommand command, poly_coeff_t parameter, Stack *
 
 		default:
 			assert(false);
-			return PARSER_ERROR;
+			return FUNC_ERROR;
 			break;
 	}
 }

@@ -9,16 +9,10 @@
 #ifndef __PARSER_H__
 #define __PARSER_H__
 
-/** TODO */
-typedef enum ParserResult
-{
-	PARSER_SUCCESS,
-	PARSER_ERROR,
-	PARSER_END_OF_FILE
-} ParserResult;
+#include "error.h"
 
 /** TODO */
-typedef enum CalcCommand
+typedef enum ParserCommand
 {
 	CALC_ZERO,
 	CALC_IS_COEFF,
@@ -35,7 +29,7 @@ typedef enum CalcCommand
 	CALC_PRINT,
 	CALC_POP,
 	CALC_WRONG_COMMAND
-} CalcCommand;
+} ParserCommand;
 
 /** TODO */
 bool ParserIsCommand();
@@ -44,9 +38,9 @@ bool ParserIsCommand();
 bool ParserIsEndOfFile();
 
 /** TODO */
-ParserResult ParseLinePoly(Poly *p, int row);
+FuncResult ParseLinePoly(Poly *p, int row);
 
 /** TODO */
-ParserResult ParseLineCommand(CalcCommand *command, long *parameter, int row);
+FuncResult ParseLineCommand(ParserCommand *command, long *parameter, int row);
 
 #endif /* __PARSER_H__ */

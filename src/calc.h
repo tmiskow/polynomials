@@ -9,14 +9,14 @@
 #ifndef __CALC_H__
 #define __CALC_H__
 
-#include "poly.h"
-#include "parser.h"
+#include "stack.h"
+#include "error.h"
 
 /** TODO */
-ParserResult CalcAdd(Stack *stack);
+FuncResult CalcAdd(Stack *stack);
 
 /** TODO */
-ParserResult CalcPrint(Stack *stack);
+FuncResult CalcPrint(Stack *stack);
 
 /* TODO */
 
