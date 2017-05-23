@@ -45,6 +45,9 @@ static bool ParserVarIndexIsInRange(unsigned long parser_var_index);
 static bool CharIsStartOfCoeff(char c);
 
 /** TODO */
+static bool CharIsStartOfCommand(char c);
+
+/** TODO */
 static parser_coeff_t CharToCoeff(char c);
 
 /** TODO */
@@ -111,6 +114,11 @@ static bool ParserVarIndexIsInRange(unsigned long parser_var_index)
 static inline bool CharIsStartOfCoeff(char c)
 {
 	return isdigit(c) || c == '-';
+}
+
+static bool CharIsStartOfCommand(char c)
+{
+	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
 static parser_exp_t CharToExp(char c)
@@ -450,10 +458,18 @@ static ParserResult ParseValue(poly_coeff_t *value)
 
 /* IMPLEMENTACJA FUNKCJI GŁÓWNYCH */
 
-ParserResult ParseLinePoly(Poly *p)
+bool ParserIsCommand()
 {
-	/* TODO */
+	return CharIsStartOfCommand(CharPeek());
+}
 
+bool ParserIsEndOfFile()
+{
+	return CharPeek() == EOF;
+}
+
+ParserResult ParseLinePoly(Poly *p, int row)
+{
 	int col = 1;
 
 	ParserResult parser_result = ParsePoly(&col, p);
@@ -461,17 +477,18 @@ ParserResult ParseLinePoly(Poly *p)
 	if (parser_result == PARSER_ERROR || CharPeek() != '\n')
 	{
 		PolyDestroy(p);
-		ErrorParserPoly(1, col);
+		ErrorParserPoly(row, col);
 		ParserSkipLine();
 		return PARSER_ERROR;
 	}
 	else
 	{
+		ParserSkipLine();
 		return parser_result;
 	}
 }
 
-ParserResult ParseLineCommand(CalcCommand *command, poly_coeff_t *parameter)
+ParserResult ParseLineCommand(CalcCommand *command, poly_coeff_t *parameter, int row)
 {
 	char char_array[MAX_COMMAND_LENGTH] = "";
 
@@ -509,7 +526,7 @@ ParserResult ParseLineCommand(CalcCommand *command, poly_coeff_t *parameter)
 					else
 					{
 						ParserSkipLine();
-						ErrorParserVariable(1);
+						ErrorParserVariable(row);
 						return PARSER_ERROR;
 					}
 					break;
@@ -518,7 +535,7 @@ ParserResult ParseLineCommand(CalcCommand *command, poly_coeff_t *parameter)
 					if (ParseValue(parameter) == PARSER_ERROR)
 					{
 						ParserSkipLine();
-						ErrorParserValue(1);
+						ErrorParserValue(row);
 						return PARSER_ERROR;
 					}
 					break;
@@ -531,7 +548,7 @@ ParserResult ParseLineCommand(CalcCommand *command, poly_coeff_t *parameter)
 			if (CharPeek() != '\n')
 			{
 				ParserSkipLine();
-				ErrorParserCommand(1);
+				ErrorParserCommand(row);
 				return PARSER_ERROR;
 			}
 			else

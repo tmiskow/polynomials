@@ -38,9 +38,15 @@ typedef enum CalcCommand
 } CalcCommand;
 
 /** TODO */
-ParserResult ParseLinePoly(Poly *p);
+bool ParserIsCommand();
 
 /** TODO */
-ParserResult ParseLineCommand(CalcCommand *command, long *parameter);
+bool ParserIsEndOfFile();
+
+/** TODO */
+ParserResult ParseLinePoly(Poly *p, int row);
+
+/** TODO */
+ParserResult ParseLineCommand(CalcCommand *command, long *parameter, int row);
 
 #endif /* __PARSER_H__ */
