@@ -18,6 +18,29 @@ typedef enum ParserResult
 } ParserResult;
 
 /** TODO */
+typedef enum CalcCommand
+{
+	CALC_ZERO,
+	CALC_IS_COEFF,
+	CALC_IS_ZERO,
+	CALC_CLONE,
+	CALC_ADD,
+	CALC_MUL,
+	CALC_NEG,
+	CALC_SUB,
+	CALC_IS_EQ,
+	CALC_DEG,
+	CALC_DEG_BY,
+	CALC_AT,
+	CALC_PRINT,
+	CALC_POP,
+	CALC_WRONG_COMMAND
+} CalcCommand;
+
+/** TODO */
 ParserResult ParseLinePoly(Poly *p);
+
+/** TODO */
+ParserResult ParseLineCommand(CalcCommand *command, long *parameter);
 
 #endif /* __PARSER_H__ */
