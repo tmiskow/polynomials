@@ -12,4 +12,13 @@
 /** TODO */
 void ErrorParserPoly(int row, int col);
 
+/** TODO */
+void ErrorParserCommand(int row);
+
+/** TODO */
+void ErrorParserValue(int row);
+
+/** TODO */
+void ErrorParserVariable(int row);
+
 #endif /* __ERROR_H__ */
