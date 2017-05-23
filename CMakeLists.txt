@@ -24,10 +24,13 @@ set(SOURCE_FILES
     src/poly.c
     src/poly.h
 	src/parser.h
+	src/parser.c
 	src/calc.h
 	src/calc.c
 	src/stack.h
 	src/stack.c
+	src/error.h
+	src/error.c
     src/calc_poly.c
 )
 
