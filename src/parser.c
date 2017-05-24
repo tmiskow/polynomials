@@ -170,12 +170,15 @@ static FuncResult ParseCoeff(int *col, poly_coeff_t *coeff)
 
 		while (isdigit(CharPeek()))
 		{
-			char c = ParseChar(col);
-			parser_coeff = 10 * (parser_coeff) + CharToCoeff(c);
+			parser_coeff = 10 * (parser_coeff) + CharToCoeff(CharPeek());
 
 			if (!ParserCoeffIsInRange(parser_coeff, is_negative))
 			{
 				return FUNC_ERROR;
+			}
+			else
+			{
+				ParseChar(col);
 			}
 		}
 
@@ -206,12 +209,15 @@ static FuncResult ParseMonoExp(int *col, poly_exp_t *exp)
 
 		while (isdigit(CharPeek()))
 		{
-			char c = ParseChar(col);
-			parser_exp = 10 * parser_exp + CharToExp(c);
+			parser_exp = 10 * parser_exp + CharToExp(CharPeek());
 
 			if (!ParserExpIsInRange(parser_exp))
 			{
 				return FUNC_ERROR;
+			}
+			else
+			{
+				ParseChar(col);
 			}
 		}
 
@@ -398,12 +404,15 @@ static FuncResult ParseVarIdx(unsigned *var_idx)
 
 		while (isdigit(CharPeek()))
 		{
-			char c = ParseChar(NULL);
-			parser_var_idx = 10 * parser_var_idx + CharToExp(c);
+			parser_var_idx = 10 * parser_var_idx + CharToExp(CharPeek());
 
 			if (!ParserVarIndexIsInRange(parser_var_idx))
 			{
 				return FUNC_ERROR;
+			}
+			else
+			{
+				ParseChar(NULL);
 			}
 		}
 
@@ -519,20 +528,20 @@ FuncResult ParseLineCommand(ParserCommand *command, poly_coeff_t *parameter, int
 			switch (*command)
 			{
 				case CALC_DEG_BY:
-					if (ParseVarIdx(&var_idx) == FUNC_SUCCESS)
-					{
-						*parameter = (poly_coeff_t) var_idx;
-					}
-					else
+					if (ParseVarIdx(&var_idx) == FUNC_ERROR || CharPeek() != '\n')
 					{
 						ParserSkipLine();
 						ErrorParserVariable(row);
 						return FUNC_ERROR;
 					}
+					else
+					{
+						*parameter = (poly_coeff_t) var_idx;
+					}
 					break;
 
 				case CALC_AT:
-					if (ParseValue(parameter) == FUNC_ERROR)
+					if (ParseValue(parameter) == FUNC_ERROR || CharPeek() != '\n')
 					{
 						ParserSkipLine();
 						ErrorParserValue(row);
@@ -545,17 +554,8 @@ FuncResult ParseLineCommand(ParserCommand *command, poly_coeff_t *parameter, int
 					break;
 			}
 
-			if (CharPeek() != '\n')
-			{
-				ParserSkipLine();
-				ErrorParserCommand(row);
-				return FUNC_ERROR;
-			}
-			else
-			{
-				ParseChar(NULL);
-				return FUNC_SUCCESS;
-			}
+			ParseChar(NULL);
+			return FUNC_SUCCESS;
 		}
 		else
 		{
