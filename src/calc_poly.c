@@ -42,10 +42,9 @@ int main(void) {
 					ErrorStackUnderflow(row);
 				}
 			}
-
 			else
 			{
-				assert(false);
+				//assert(false);
 			}
 		}
 		else
@@ -57,10 +56,9 @@ int main(void) {
 			{
 				StackPush(&stack, &p);
 			}
-
 			else
 			{
-				assert(false);
+				//assert(false);
 			}
 		}
 	}
@@ -72,21 +70,65 @@ int main(void) {
 
 FuncResult CommandExecute(ParserCommand command, poly_coeff_t parameter, Stack *stack)
 {
-	// TODO
-	parameter = parameter;
-
 	switch (command)
 	{
+		case CALC_ZERO:
+			return CalcZero(stack);
+			break;
+
+		case CALC_IS_COEFF:
+			return CalcIsCoeff(stack);
+			break;
+
+		case CALC_IS_ZERO:
+			return CalcIsZero(stack);
+			break;
+
+		case CALC_CLONE:
+			return CalcClone(stack);
+			break;
+
 		case CALC_ADD:
 			return CalcAdd(stack);
+			break;
+
+		case CALC_MUL:
+			return CalcMul(stack);
+			break;
+
+		case CALC_NEG:
+			return CalcNeg(stack);
+			break;
+
+		case CALC_SUB:
+			return CalcSub(stack);
+			break;
+
+		case CALC_IS_EQ:
+			return CalcIsEq(stack);
+			break;
+
+		case CALC_DEG:
+			return CalcDeg(stack);
+			break;
+
+		case CALC_DEG_BY:
+			return CalcDegBy(stack, (unsigned) parameter);
+			break;
+
+		case CALC_AT:
+			return CalcAt(stack, parameter);
 			break;
 
 		case CALC_PRINT:
 			return CalcPrint(stack);
 			break;
 
+		case CALC_POP:
+			return CalcPop(stack);
+			break;
+
 		default:
-			assert(false);
 			return FUNC_ERROR;
 			break;
 	}
