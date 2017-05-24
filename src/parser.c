@@ -108,7 +108,7 @@ static bool ParserExpIsInRange(parser_exp_t parser_exp)
 
 static bool ParserVarIndexIsInRange(unsigned long parser_var_index)
 {
-	return parser_var_index <= INT_MAX;
+	return parser_var_index <= UINT_MAX;
 }
 
 static inline bool CharIsStartOfCoeff(char c)
@@ -505,7 +505,7 @@ FuncResult ParseLineCommand(ParserCommand *command, poly_coeff_t *parameter, int
 	if (*command == CALC_WRONG_COMMAND)
 	{
 		ParserSkipLine();
-		ErrorParserCommand(1);
+		ErrorParserCommand(row);
 		return FUNC_ERROR;
 	}
 	else if (*command == CALC_DEG_BY || *command == CALC_AT)
@@ -553,19 +553,20 @@ FuncResult ParseLineCommand(ParserCommand *command, poly_coeff_t *parameter, int
 			}
 			else
 			{
+				ParseChar(NULL);
 				return FUNC_SUCCESS;
 			}
 		}
 		else
 		{
 			ParserSkipLine();
-			ErrorParserCommand(1);
+			ErrorParserCommand(row);
 			return FUNC_ERROR;
 		}
 	}
 	else if (CharPeek() != '\n')
 	{
-		ErrorParserCommand(1);
+		ErrorParserCommand(row);
 		ParserSkipLine();
 		return FUNC_ERROR;
 	}
