@@ -255,11 +255,13 @@ static FuncResult ParseMono(int *col, Mono *m)
 				}
 				else
 				{
+					PolyDestroy(&p);
 					return FUNC_ERROR;
 				}
 			}
 			else
 			{
+				PolyDestroy(&p);
 				return FUNC_ERROR;
 			}
 		}
@@ -317,7 +319,14 @@ static FuncResult ParsePoly(int *col, Poly *p)
 			}
 		} while (result == FUNC_SUCCESS && CharPeek() == '+');
 
-		*p = PolyAddMonos(count, monos);
+		if (result == FUNC_SUCCESS)
+		{
+			*p = PolyAddMonos(count, monos);
+		}
+		else
+		{
+			*p = PolyZero();
+		}
 		free(monos);
 		return result;
 	}
