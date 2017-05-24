@@ -20,12 +20,6 @@ static StackItem* StackItemCreate();
  */
 static StackItem StackItemFromPoly(const Poly *p, StackItem *next_item);
 
-/** TODO */
-static void StackItemDestroy(StackItem* stack_item);
-
-/** TODO */
-static void StackDestroyItemsRecursively(StackItem* stack_item);
-
 static StackItem* StackItemCreate()
 {
 	StackItem *new_item = (StackItem*) malloc(sizeof (StackItem));
@@ -42,21 +36,6 @@ static StackItem StackItemFromPoly(const Poly *p, StackItem *next_item)
 	};
 }
 
-static void StackItemDestroy(StackItem* stack_item)
-{
-	PolyDestroy(&(stack_item->poly));
-	free(stack_item);
-}
-
-static void StackDestroyItemsRecursively(StackItem* stack_item)
-{
-	if (stack_item)
-	{
-		StackDestroyItemsRecursively(stack_item->next_item);
-		StackItemDestroy(stack_item);
-	}
-}
-
 void StackInit(Stack *stack)
 {
 	stack->top_item = NULL;
@@ -64,7 +43,11 @@ void StackInit(Stack *stack)
 
 void StackDestroy(Stack *stack)
 {
-	StackDestroyItemsRecursively(stack->top_item);
+	while (!StackIsEmpty(stack))
+	{
+		Poly p = StackPop(stack);
+		PolyDestroy(&p);
+	}
 }
 
 void StackPush(Stack *stack, const Poly *p)
