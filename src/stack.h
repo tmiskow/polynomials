@@ -48,6 +48,9 @@ void StackPush(Stack *stack, const Poly *p);
 Poly StackPop(Stack *stack);
 
 /** TODO */
+Poly StackPeek(Stack *stack);
+
+/** TODO */
 bool StackIsEmpty(const Stack *stack);
 
 #endif /* __STACK_H__ */

@@ -86,6 +86,13 @@ Poly StackPop(Stack *stack)
 	return p;
 }
 
+Poly StackPeek(Stack *stack)
+{
+	//DEBUG
+	assert(!StackIsEmpty(stack));
+	return (stack->top_item)->poly;
+}
+
 bool StackIsEmpty(const Stack *stack)
 {
 	return stack->top_item == NULL;
