@@ -126,6 +126,25 @@ static FuncResult ParseMonoExp(int *col, poly_exp_t *exp);
 static FuncResult ParseMono(int *col, Mono *m);
 
 /**
+ * Parsuj tablicę jednomianów ze standardowego wejścia.
+ * Iteruje @p col o liczbę wczytanych znaków.
+ * @param[in] col : wskaźnik na liczbę kolumn do iterowania
+ * @param[in] count : wskaźnik na liczbę jednomianów (rozmiar tablicy) do nadpisania
+ * @param[in] monos : wskaźnik na tablicę jednomianów do nadpisania
+ * @return status zakończenia funkcji informujący o sukcesie lub błędzie
+ */
+static FuncResult ParseMonoArray(int *col, unsigned *count, Mono **monos);
+
+/**
+ * Parsuje wielomian stały (będący wspołczynnikem) ze standardowego wejścia.
+ * Iteruje @p col o liczbę wczytanych znaków.
+ * @param[in] col : wskaźnik na liczbę kolumn do iterowania
+ * @param[in] p : wskaźnik na wielomian do nadpisania
+ * @return status zakończenia funkcji informujący o sukcesie lub błędzie
+ */
+static FuncResult ParsePolyCoeff(int *col, Poly *p);
+
+/**
  * Parsuje wielomian ze standardowego wejścia.
  * Iteruje @p col o liczbę wczytanych znaków.
  * @param[in] col : wskaźnik na liczbę kolumn do iterowania
@@ -250,7 +269,6 @@ static FuncResult ParseCoeff(int *col, poly_coeff_t *coeff)
 				return FUNC_ERROR;
 			}
 		}
-
 		while (isdigit(CharPeek()))
 		{
 			parser_coeff = 10 * (parser_coeff) + CharToCoeff(CharPeek());
@@ -359,48 +377,67 @@ static FuncResult ParseMono(int *col, Mono *m)
 	}
 }
 
+static FuncResult ParseMonoArray(int *col, unsigned *count, Mono **monos)
+{
+	unsigned size = 10;
+	Mono* temp_monos = (Mono*) calloc(size, sizeof(Mono));
+	assert(monos);
+
+	unsigned i = 0;
+
+	FuncResult result = FUNC_SUCCESS;
+	do
+	{
+		if (CharPeek() == '+')
+		{
+			ParseChar(col);
+		}
+
+		result = ParseMono(col, &(temp_monos[i]));
+		i++;
+
+		if (i == size - 1)
+		{
+			size *= 2;
+			temp_monos = (Mono*) realloc(temp_monos, size * sizeof(Mono));
+			assert(monos);
+		}
+	} while (result == FUNC_SUCCESS && CharPeek() == '+');
+
+
+	*monos = temp_monos;
+	*count = i;
+
+	return result;
+}
+
+static FuncResult ParsePolyCoeff(int *col, Poly *p)
+{
+	poly_coeff_t coeff;
+
+	if (ParseCoeff(col, &coeff) == FUNC_ERROR)
+	{
+		return FUNC_ERROR;
+	}
+	else
+	{
+		*p = PolyFromCoeff(coeff);
+		return FUNC_SUCCESS;
+	}
+}
+
 static FuncResult ParsePoly(int *col, Poly *p)
 {
 	if (CharIsStartOfCoeff(CharPeek()))
 	{
-		poly_coeff_t coeff;
-
-		if (ParseCoeff(col, &coeff) == FUNC_ERROR)
-		{
-			return FUNC_ERROR;
-		}
-		else
-		{
-			*p = PolyFromCoeff(coeff);
-			return FUNC_SUCCESS;
-		}
+		return ParsePolyCoeff(col, p);
 	}
 	else if (CharPeek() == '(')
 	{
-		unsigned size = 10;
-		Mono* monos = (Mono*) calloc(size, sizeof(Mono));
-		assert(monos);
+		Mono* monos;
+		unsigned count;
 
-		unsigned count = 0;
-
-		FuncResult result = FUNC_SUCCESS;
-		do
-		{
-			if (CharPeek() == '+')
-			{
-				ParseChar(col);
-			}
-
-			result = ParseMono(col, &(monos[count]));
-			count++;
-
-			if (count == size - 1)
-			{
-				size *= 2;
-				monos = (Mono*) realloc(monos, size * sizeof(Mono));
-				assert(monos);
-			}
-		} while (result == FUNC_SUCCESS && CharPeek() == '+');
+		FuncResult result = ParseMonoArray(col, &count, &monos);
 
 		if (result == FUNC_SUCCESS)
 		{
@@ -408,6 +445,7 @@ static FuncResult ParsePoly(int *col, Poly *p)
 		}
 		else
 		{
+			// TODO
 			*p = PolyZero();
 		}
 		free(monos);
