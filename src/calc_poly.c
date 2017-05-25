@@ -17,7 +17,7 @@
 /**
  * Wykonuje komendę kalkulatora otrzymaną od parsera
  * @param[in] command : komenda otrzymana od parsera
- * @param[in] parameter : parametr wykorzystywant przy CALC_DEG_BY i CALC_AT
+ * @param[in] parameter : parametr wykorzystywant przy `CALC_DEG_BY` i `CALC_AT`
  * @param[in] stack : stos kalkulatora
  * @return status zakończenia funkcji inofrumjący o sukcesie lub błędzie
  */
@@ -25,6 +25,10 @@ FuncResult CommandExecute(ParserCommand command,
 	                      poly_coeff_t parameter,
 						  Stack *stack);
 
+/**
+* Główna funkcja kalkulatora.
+* @return 0
+*/
 int main(void) {
 
 	Stack stack;

@@ -8,16 +8,10 @@
 
 #include "poly.h"
 
-/** @defgroup funkcje_główne Funkcje główne
- * Główne funkcje biblioteki.
- * @defgroup funkcje_pomocnicze Funkcje pomocnicze
- * Statyczne funkcje pomocnicze wykorzystywane przez funkcje główne.
+/** @name Funkcje pomocnicze
+ * Funkcje przeznaczone do użycia tylko przez funkcje główne tego pliku.
  */
-
- /**
- * @ingroup funkcje_pomocnicze
- * @{
- */
+///@{
 
 /**
  * Tworzy jednomian tożsamościowo równy zeru.
@@ -514,12 +508,12 @@ static Poly MonoAt(const Mono *m, poly_coeff_t x)
 	return PolyMul(&(m->p), &temp_poly);
 }
 
-/** @} */ // koniec grupy pomocnicze_funkcje
+///@}
 
-/**
-* @ingroup funkcje_główne
-* @{
-*/
+/** @name Funkcje główne
+ * Funkcje zadeklarowane w poly.h przeznaczone do używania w innych plikach.
+ */
+///@{
 
 void PolyDestroy(Poly *p)
 {
@@ -754,4 +748,4 @@ Poly PolyAt(const Poly *p, poly_coeff_t x)
 	}
 }
 
-/** @} */ // koniec grupy funkcje_główne
+///@}

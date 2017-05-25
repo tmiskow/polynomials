@@ -27,6 +27,11 @@ static StackItem* StackItemCreate();
  */
 static StackItem StackItemFromPoly(const Poly *p, StackItem *next_item);
 
+/** @name Funkcje pomocnicze
+ * Funkcje przeznaczone do użycia tylko przez funkcje główne tego pliku.
+ */
+///@{
+
 static StackItem* StackItemCreate()
 {
 	StackItem *new_item = (StackItem*) malloc(sizeof (StackItem));
@@ -42,6 +47,13 @@ static StackItem StackItemFromPoly(const Poly *p, StackItem *next_item)
 		.next_item = next_item
 	};
 }
+
+///@}
+
+/** @name Funkcje główne
+ * Funkcje zadeklarowane w stack.h przeznaczone do używania w innych plikach.
+ */
+///@{
 
 void StackInit(Stack *stack)
 {
@@ -85,3 +97,5 @@ bool StackIsEmpty(const Stack *stack)
 {
 	return stack->top_item == NULL;
 }
+
+///@}

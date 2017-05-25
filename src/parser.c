@@ -27,8 +27,6 @@ typedef unsigned long parser_coeff_t;
 /** Typ wykładników wielomianu używany przez parser */
 typedef long parser_exp_t;
 
-/* DEKLARACJE FUNKCJI POMOCNICZYCH */
-
 /**
  * Wczytuje znaki ze standardowego wejścia aż do napotkania znaku `\n`
  */
@@ -144,7 +142,8 @@ static FuncResult ParsePoly(int *col, Poly *p);
 static ParserCommand ParseCommandFromArray(char char_array[]);
 
 /**
- * Parsuje indeks zmiennej (parametr komendy CALC_DEG_BY) ze standardowego wejścia.
+ * Parsuje indeks zmiennej (parametr komendy CALC_DEG_BY)
+ * ze standardowego wejścia.
  * @param[in] var_idx : wskaźnik na indeks zmiennej do nadpisania
  * @return status zakończenia funkcji informujący o sukcesie lub błędzie
  */
@@ -157,7 +156,10 @@ static FuncResult ParseVarIdx(unsigned *var_idx);
  */
 static FuncResult ParseValue(poly_coeff_t *coeff);
 
-/* IMPLEMENTACJA FUNKCJI POMOCNICZYCH */
+/** @name Funkcje pomocnicze
+ * Funkcje przeznaczone do użycia tylko przez funkcje główne tego pliku.
+ */
+///@{
 
 static void ParserSkipLine()
 {
@@ -555,7 +557,12 @@ static FuncResult ParseValue(poly_coeff_t *value)
 	}
 }
 
-/* IMPLEMENTACJA FUNKCJI GŁÓWNYCH */
+///@}
+
+/** @name Funkcje główne
+ * Funkcje zadeklarowane w parser.h przeznaczone do używania w innych plikach.
+ */
+///@{
 
 bool ParserLineIsCommand()
 {
@@ -587,7 +594,9 @@ FuncResult ParseLinePoly(Poly *p, int row)
 	}
 }
 
-FuncResult ParseLineCommand(ParserCommand *command, poly_coeff_t *parameter, int row)
+FuncResult ParseLineCommand(ParserCommand *command,
+	                        poly_coeff_t *parameter,
+							int row)
 {
 	char char_array[MAX_COMMAND_LENGTH] = "";
 

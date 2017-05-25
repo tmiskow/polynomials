@@ -13,8 +13,6 @@
 
 #include <stdio.h>
 
-/* DEKLARACJE FUNKCJI POMOCNICZYCH */
-
 /**
  * Wypisuje na standardowe wyjście jednomian @p m.
  * @param[in] m : jednomian
@@ -34,7 +32,10 @@ static void CalcPrintMonoArray(unsigned count, const Mono monos[]);
 */
 static void CalcPrintPoly(const Poly *p);
 
-/* IMPLEMENTACJA FUNKCJI POMOCNICZYCH */
+/** @name Funkcje pomocnicze
+ * Funkcje przeznaczone do użycia tylko przez funkcje główne tego pliku.
+ */
+///@{
 
 static void CalcPrintMono(const Mono* m)
 {
@@ -66,7 +67,12 @@ static void CalcPrintPoly(const Poly *p)
 	}
 }
 
-/* IMPLEMENTACJA FUNKCJI GŁÓWNYCH */
+///@}
+
+/** @name Funkcje główne
+ * Funkcje zadeklarowane w calc.h przeznaczone do używania w innych plikach.
+ */
+///@{
 
 FuncResult CalcZero(Stack *stack)
 {
@@ -318,3 +324,5 @@ FuncResult CalcPop(Stack *stack)
 		return FUNC_SUCCESS;
 	}
 }
+
+///@}

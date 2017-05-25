@@ -51,11 +51,6 @@ struct Mono
 };
 
 /**
-* @ingroup funkcje_główne
-* @{
-*/
-
-/**
  * Tworzy wielomian, który jest współczynnikiem.
  * @param[in] c : wartość współczynnika
  * @return wielomian
@@ -218,7 +213,5 @@ bool PolyIsEq(const Poly *p, const Poly *q);
  * @return @f$p(x, x_0, x_1, \ldots)@f$
  */
 Poly PolyAt(const Poly *p, poly_coeff_t x);
-
-/** @} */ // koniec grupy funkcje_główne
 
 #endif /* __POLY_H__ */
