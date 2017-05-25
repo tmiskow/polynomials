@@ -1,9 +1,9 @@
 /** @file
-   TODO
+   Implementacja funkcji z error.h
 
    @author Tomasz Miśków <tm385898@students.mimuw.edu.pl>
    @copyright Uniwersytet Warszawski
-   @date TODO
+   @date 2017-05-25
 */
 
 #include "error.h"
@@ -31,6 +31,5 @@ void ErrorParserVariable(int row)
 
 void ErrorStackUnderflow(int row)
 {
-	// TODO
 	fprintf(stderr, "ERROR %d STACK UNDERFLOW\n", row);
 }

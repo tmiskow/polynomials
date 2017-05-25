@@ -1,9 +1,9 @@
 /** @file
-   TODO
+   Implementacja funkcji z stack.h i funkcji pomocniczych
 
    @author Tomasz Miśków <tm385898@students.mimuw.edu.pl>
    @copyright Uniwersytet Warszawski
-   @date TODO
+   @date 2017-05-25
 */
 
 #include "poly.h"
@@ -12,11 +12,18 @@
 #include <stdlib.h>
 #include <assert.h>
 
-/** TODO */
+/**
+ * Alokuje nowy element stosu.
+ * @return wskaźnik na nowy element
+ */
 static StackItem* StackItemCreate();
 
-/** TODO
+/**
+ * Tworzy nowy element stosu z wielomianu.
  * Przejmuje wielomian @p p na własność.
+ * @param[in] p : wielomian
+ * @param[in] next_item : wskaźnik na następny element
+ * @return nowy element stosu
  */
 static StackItem StackItemFromPoly(const Poly *p, StackItem *next_item);
 
@@ -59,7 +66,6 @@ void StackPush(Stack *stack, const Poly *p)
 
 Poly StackPop(Stack *stack)
 {
-	//DEBUG
 	assert(!StackIsEmpty(stack));
 
 	StackItem *temp_pointer = stack->top_item;
@@ -71,7 +77,6 @@ Poly StackPop(Stack *stack)
 
 Poly StackPeek(Stack *stack)
 {
-	//DEBUG
 	assert(!StackIsEmpty(stack));
 	return (stack->top_item)->poly;
 }

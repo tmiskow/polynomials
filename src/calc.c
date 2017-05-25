@@ -1,9 +1,9 @@
 /** @file
-   TODO
+   Implementacja funkcji z calc.h i statycznych funkcji pomocniczych
 
    @author Tomasz Miśków <tm385898@students.mimuw.edu.pl>
    @copyright Uniwersytet Warszawski
-   @date TODO
+   @date 2017-05-25
 */
 
 #include "poly.h"
@@ -15,13 +15,23 @@
 
 /* DEKLARACJE FUNKCJI POMOCNICZYCH */
 
-/** TODO */
+/**
+ * Wypisuje na standardowe wyjście jednomian @p m.
+ * @param[in] m : jednomian
+*/
 static void CalcPrintMono(const Mono* m);
 
-/** TODO */
+/**
+ * Wypisuje na standardowe wyjście tablicę jednomianów @p monos.
+ * @param[in] count : liczba jednomianów (rozmiar tablicy)
+ * @param[in] monos : tablica jednomianów
+ */
 static void CalcPrintMonoArray(unsigned count, const Mono monos[]);
 
-/** TODO */
+/**
+ * Wypisuje na standardowe wyjście wielomian @p p.
+ * @param[in] p : wielomian
+*/
 static void CalcPrintPoly(const Poly *p);
 
 /* IMPLEMENTACJA FUNKCJI POMOCNICZYCH */

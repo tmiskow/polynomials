@@ -1,9 +1,9 @@
 /** @file
-   TODO
+   Implementacja funkcji z parser.h i funkcji pomocniczych
 
    @author Tomasz Miśków <tm385898@students.mimuw.edu.pl>
    @copyright Uniwersytet Warszawski
-   @date TODO
+   @date 2017-05-25
 */
 
 #include "poly.h"
@@ -18,74 +18,155 @@
 #include <assert.h>
 #include <limits.h>
 
-/** TODO */
+/** Stała reprezentująca maksymalną długość komendy */
 #define MAX_COMMAND_LENGTH 9
 
-/** TODO */
+/** Typ wspołczynnikow wielomianu używany przez parser */
 typedef unsigned long parser_coeff_t;
 
-/** TODO */
+/** Typ wykładników wielomianu używany przez parser */
 typedef long parser_exp_t;
 
 /* DEKLARACJE FUNKCJI POMOCNICZYCH */
 
-/** TODO */
+/**
+ * Wczytuje znaki ze standardowego wejścia aż do napotkania znaku `\n`
+ */
 static void ParserSkipLine();
 
-/** TODO */
+/**
+ * Sprawdza, czy współcznnik mieści się w obsługiwanym zakresie.
+ * Dopuszczalny zakres to `[LONG_MIN; LONG_MAX].
+ * @param[in] parser_coeff : moduł wspołczynnika
+ * @param[in] is_negative : Czy współczynnik jest ujemny?
+ * @return Czy współcznnik mieście się w obsługiwanym zakresie?
+ */
 static bool ParserCoeffIsInRange(parser_coeff_t parser_coeff, bool is_negative);
 
-/** TODO */
+/**
+ * Sprawdza, czy wykładnik mieści się w obsługiwanym zakresie.
+ * Dopuszczalny zakres to `[0; INT_MAX].
+ * @param[in] parser_exp : wykładnik
+ * @return Czy wykładnik mieście się w obsługiwanym zakresie?
+ */
 static bool ParserExpIsInRange(parser_exp_t parser_exp);
 
-/** TODO */
+/**
+ * Sprawdza, czy indeks zmiennej mieści się w obsługiwanym zakresie.
+ * Dopuszczalny zakres to `[0; UINT_MAX].
+ * @param[in] parser_var_index : indeks zmiennej
+ * @return Czy indeks zmiennej mieście się w obsługiwanym zakresie?
+ */
 static bool ParserVarIndexIsInRange(unsigned long parser_var_index);
 
-/** TODO */
+/**
+ * Sprawdza, czy znak jest początkiem współczynnika.
+ * @param[in] c : znak
+ * @return Czy znak jest początkiem współczynnika?
+ */
 static bool CharIsStartOfCoeff(char c);
 
-/** TODO */
+/**
+ * Sprawdza, czy znak jest początkiem komendy.
+ * @param[in] c : znak
+ * @return Czy znak jest początkiem komendy?
+ */
 static bool CharIsStartOfCommand(char c);
 
-/** TODO */
+/**
+ * Konwertuje znak (zakładając, że reprezentuje cyfrę) na typ @p parser_coeff_t.
+ * @param[in] c : znak
+ * @return liczba typy @p parser_coeff_t
+ */
 static parser_coeff_t CharToCoeff(char c);
 
-/** TODO */
+/**
+ * Konwertuje znak (zakładając, że reprezentuje cyfrę) na typ @p parser_exp_t.
+ * @param[in] c : znak
+ * @return liczba typy @p parser_exp_t
+ */
 static parser_exp_t CharToExp(char c);
 
-/** TODO */
+/**
+ * Podgląda znak ze standardowego wejścia.
+ * @return podejrzany znak
+ */
 static char CharPeek();
 
-/** TODO */
+/**
+ * Parsuje znak ze standardowego wejścia. Iteruje @p col o `1`.
+ * @param[in] col : wskaźnik na liczbę kolumn do iterowania
+ * @return sparsowany znak
+ */
 static char ParseChar(int *col);
 
-/** TODO */
+/**
+ * Parsuje współczynnik ze standardowego wejścia.
+ * Iteruje @p col o liczbę wczytanych znaków.
+ * @param[in] col : wskaźnik na liczbę kolumn do iterowania
+ * @param[in] coeff : wskaźnik na współcznnik do nadpisania
+ * @return status zakończenia funkcji informujący o sukcesie lub błędzie
+ */
 static FuncResult ParseCoeff(int *col, poly_coeff_t *coeff);
 
-/** TODO */
+/**
+ * Parsuje wykładnik ze standardowego wejścia.
+ * Iteruje @p col o liczbę wczytanych znaków.
+ * @param[in] col : wskaźnik na liczbę kolumn do iterowania
+ * @param[in] exp : wskaźnik na wykładnik do nadpisania
+ * @return status zakończenia funkcji informujący o sukcesie lub błędzie
+ */
 static FuncResult ParseMonoExp(int *col, poly_exp_t *exp);
 
-/** TODO */
+/**
+ * Parsuje jednomian ze standardowego wejścia.
+ * Iteruje @p col o liczbę wczytanych znaków.
+ * @param[in] col : wskaźnik na liczbę kolumn do iterowania
+ * @param[in] m : wskaźnik na jednomian do nadpisania
+ * @return status zakończenia funkcji informujący o sukcesie lub błędzie
+ */
 static FuncResult ParseMono(int *col, Mono *m);
 
-/** TODO */
+/**
+ * Parsuje wielomian ze standardowego wejścia.
+ * Iteruje @p col o liczbę wczytanych znaków.
+ * @param[in] col : wskaźnik na liczbę kolumn do iterowania
+ * @param[in] p : wskaźnik na wielomian do nadpisania
+ * @return status zakończenia funkcji informujący o sukcesie lub błędzie
+ */
 static FuncResult ParsePoly(int *col, Poly *p);
 
-/** TODO */
+/**
+ * Parsuje komendę z tablicy znaków.
+ * @param[in] char_array : tablica znaków
+ * @return sparsowana komenda
+ */
 static ParserCommand ParseCommandFromArray(char char_array[]);
 
-/** TODO */
+/**
+ * Parsuje indeks zmiennej (parametr komendy CALC_DEG_BY) ze standardowego wejścia.
+ * @param[in] var_idx : wskaźnik na indeks zmiennej do nadpisania
+ * @return status zakończenia funkcji informujący o sukcesie lub błędzie
+ */
 static FuncResult ParseVarIdx(unsigned *var_idx);
 
-/** TODO */
+/**
+ * Parsuje wartość (parametr komendy CALC_AT) ze standardowego wejścia.
+ * @param[in] coeff : wskaźnik na wartość do nadpisania
+ * @return status zakończenia funkcji informujący o sukcesie lub błędzie
+ */
 static FuncResult ParseValue(poly_coeff_t *coeff);
 
 /* IMPLEMENTACJA FUNKCJI POMOCNICZYCH */
 
 static void ParserSkipLine()
 {
-	// TODO
-	while (getchar() != '\n');
+	char c;
+
+	do
+	{
+	 	c = getchar();
+	} while (c != '\n');
 }
 
 static bool ParserCoeffIsInRange(parser_coeff_t parser_coeff, bool is_negative)
@@ -476,12 +557,12 @@ static FuncResult ParseValue(poly_coeff_t *value)
 
 /* IMPLEMENTACJA FUNKCJI GŁÓWNYCH */
 
-bool ParserIsCommand()
+bool ParserLineIsCommand()
 {
 	return CharIsStartOfCommand(CharPeek());
 }
 
-bool ParserIsEndOfFile()
+bool ParserLineIsEndOfFile()
 {
 	return CharPeek() == EOF;
 }

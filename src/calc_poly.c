@@ -1,9 +1,9 @@
 /** @file
-   TODO
+   Główny plik kalkulatora wielomianów
 
    @author Tomasz Miśków <tm385898@students.mimuw.edu.pl>
    @copyright Uniwersytet Warszawski
-   @date TODO
+   @date 2017-05-25
 */
 
 #include "stack.h"
@@ -14,51 +14,48 @@
 #include <stdio.h>
 #include <limits.h>
 
-/** TODO */
-FuncResult CommandExecute(ParserCommand command, poly_coeff_t parameter, Stack *stack);
+/**
+ * Wykonuje komendę kalkulatora otrzymaną od parsera
+ * @param[in] command : komenda otrzymana od parsera
+ * @param[in] parameter : parametr wykorzystywant przy CALC_DEG_BY i CALC_AT
+ * @param[in] stack : stos kalkulatora
+ * @return status zakończenia funkcji inofrumjący o sukcesie lub błędzie
+ */
+FuncResult CommandExecute(ParserCommand command,
+	                      poly_coeff_t parameter,
+						  Stack *stack);
 
 int main(void) {
 
-	/* TODO */
 	Stack stack;
 	StackInit(&stack);
 
 	int row = 0;
 
-	while (!ParserIsEndOfFile())
+	while (!ParserLineIsEndOfFile())
 	{
 		row++;
 
-		if (ParserIsCommand())
+		if (ParserLineIsCommand())
 		{
 			ParserCommand command;
 			poly_coeff_t parameter;
-			FuncResult parser_result = ParseLineCommand(&command, &parameter, row);
 
-			if (parser_result == FUNC_SUCCESS)
+			if (ParseLineCommand(&command, &parameter, row) == FUNC_SUCCESS)
 			{
 				if (CommandExecute(command, parameter, &stack) == FUNC_ERROR)
 				{
 					ErrorStackUnderflow(row);
 				}
 			}
-			else
-			{
-				//assert(false);
-			}
 		}
 		else
 		{
 			Poly p;
-			FuncResult parser_result = ParseLinePoly(&p, row);
 
-			if (parser_result == FUNC_SUCCESS)
+			if (ParseLinePoly(&p, row) == FUNC_SUCCESS)
 			{
 				StackPush(&stack, &p);
-			}
-			else
-			{
-				//assert(false);
 			}
 		}
 	}
@@ -68,7 +65,9 @@ int main(void) {
 	return 0;
 }
 
-FuncResult CommandExecute(ParserCommand command, poly_coeff_t parameter, Stack *stack)
+FuncResult CommandExecute(ParserCommand command,
+	                      poly_coeff_t parameter,
+						  Stack *stack)
 {
 	switch (command)
 	{

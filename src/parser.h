@@ -1,9 +1,9 @@
 /** @file
-   TODO
+   Interfejs parsera
 
    @author Tomasz Miśków <tm385898@students.mimuw.edu.pl>
    @copyright Uniwersytet Warszawski
-   @date TODO
+   @date 2017-05-25
 */
 
 #ifndef __PARSER_H__
@@ -11,7 +11,9 @@
 
 #include "error.h"
 
-/** TODO */
+/**
+ * Typ wyliczeniowy reprezentujący komendy dla kalkulatora.
+ */
 typedef enum ParserCommand
 {
 	CALC_ZERO,
@@ -31,16 +33,35 @@ typedef enum ParserCommand
 	CALC_WRONG_COMMAND
 } ParserCommand;
 
-/** TODO */
-bool ParserIsCommand();
+/**
+ * Sprawdza, czy następny wiersz parser będzie interpretować jako komendę.
+ * Jeżeli wiersz rozpoczyna się od litery, to parser stara się zinterpretować komendę.
+ * W przeciwnym wypadku, interpretuje go jako wielomian.
+ * @return Czy następny wiersz będzie interpretowany jako komenda?
+ */
+bool ParserLineIsCommand();
 
-/** TODO */
-bool ParserIsEndOfFile();
+/**
+ * Sprawdza, czy następny wiersz jest końcem pliku.
+ * @return Czy następny wiersz jest końcem pliku?
+ */
+bool ParserLineIsEndOfFile();
 
-/** TODO */
+/**
+ * Parsuje wielomian w kolejnym wierszu.
+ * @param[in] p : wskaźnik na wielomian do nadpisania
+ * @param[in] row : numer wiersza
+ * @return status zakończenia funkcji informujący o sukcesie lub błędzie
+ */
 FuncResult ParseLinePoly(Poly *p, int row);
 
-/** TODO */
+/**
+ * Parsuje komendę w kolejnym wierszu.
+ * @param[in] command : wskaźnik na komendę do nadpisania
+ * @param[in] parameter : wskaźnik na parametr komendy do nadpisania
+ * @param[in] row : numer wiersza
+ * @return status zakończenia funkcji informujący o sukcesie lub błędzie
+ */
 FuncResult ParseLineCommand(ParserCommand *command, long *parameter, int row);
 
 #endif /* __PARSER_H__ */
